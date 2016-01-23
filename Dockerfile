@@ -2,13 +2,16 @@ FROM phusion/baseimage
 
 MAINTAINER thinca <thinca+vim@gmail.com>
 
-RUN apt-get -qq update && apt-get -qqy install git gettext libncurses5-dev libacl1-dev libgpm-dev libxmu-dev libgtk2.0-dev libxpm-dev libperl-dev python-dev python3-dev ruby-dev lua5.2 liblua5.2-dev luajit libluajit-5.1 && rm -rf /var/lib/apt/lists/*
-
-RUN git clone --quiet --depth 1 https://github.com/vim/vim.git /usr/src/vim
-
-WORKDIR /usr/src/vim
-
-RUN ./configure --with-features=huge --enable-gui=gtk2 --enable-perlinterp --enable-pythoninterp --enable-python3interp --enable-rubyinterp --enable-luainterp --with-luajit --enable-fail-if-missing && make && make install
+RUN apt-get -qq update && \
+    apt-get -qqy install git gettext libncurses5-dev libacl1-dev libgpm-dev libxmu-dev libgtk2.0-dev libxpm-dev libperl-dev python-dev python3-dev ruby-dev lua5.2 liblua5.2-dev luajit libluajit-5.1 && \
+    rm -rf /var/lib/apt/lists/* && \
+    git clone --quiet --depth 1 https://github.com/vim/vim.git /usr/src/vim && \
+    cd /usr/src/vim && \
+    ./configure --with-features=huge --enable-gui=gtk2 --enable-perlinterp --enable-pythoninterp --enable-python3interp --enable-rubyinterp --enable-luainterp --with-luajit --enable-fail-if-missing && \
+    make && \
+    make install && \
+    cd /root && \
+    rm -fr /usr/src/vim
 
 WORKDIR /root
 
