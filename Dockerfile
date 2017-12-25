@@ -1,6 +1,6 @@
 FROM alpine:3.4
 
-MAINTAINER thinca <thinca+vim@gmail.com>
+LABEL maintainer="thinca <thinca+vim@gmail.com>"
 
 RUN apk add --no-cache \
         git \
