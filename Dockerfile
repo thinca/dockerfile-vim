@@ -2,6 +2,8 @@ FROM alpine:3.7
 
 LABEL maintainer="thinca <thinca+vim@gmail.com>"
 
+ARG VIM_VERSION=master
+
 RUN apk add --no-cache \
         git \
         gcc \
@@ -20,7 +22,7 @@ RUN apk add --no-cache \
         ruby-dev \
         lua5.3-dev \
         luajit-dev \
- && git clone --quiet --depth 1 https://github.com/vim/vim.git /usr/src/vim \
+ && git clone --quiet --depth 1 --branch "${VIM_VERSION}" https://github.com/vim/vim.git /usr/src/vim \
  && cd /usr/src/vim \
  && ./configure --with-features=huge --enable-gui=gtk2 --enable-perlinterp --enable-pythoninterp --enable-python3interp --enable-rubyinterp --enable-luainterp --with-luajit --enable-fail-if-missing \
  && make \
