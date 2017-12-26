@@ -5,3 +5,7 @@ Latest Vim from [vim/vim](https://github.com/vim/vim).
 ```
 $ docker run --rm -it thinca/vim
 ```
+
+## LICENSE
+
+[zlib License](LICENSE.txt)
