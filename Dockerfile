@@ -22,11 +22,12 @@ RUN apk add --no-cache \
         ruby-dev \
         lua5.3-dev \
         luajit-dev \
+        tcl-dev \
  && git -c advice.detachedHead=false \
         clone --quiet --depth 1 --branch "${VIM_VERSION}" \
         https://github.com/vim/vim.git /usr/src/vim \
  && cd /usr/src/vim \
- && ./configure --with-features=huge --enable-gui=gtk2 --enable-perlinterp --enable-pythoninterp --enable-python3interp --enable-rubyinterp --enable-luainterp --with-luajit --enable-fail-if-missing \
+ && ./configure --with-features=huge --enable-gui=gtk2 --enable-perlinterp --enable-pythoninterp --enable-python3interp --enable-rubyinterp --enable-luainterp --with-luajit --enable-tclinterp --enable-fail-if-missing \
  && make \
  && make install \
  && cd /root \
