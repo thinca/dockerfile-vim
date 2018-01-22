@@ -69,4 +69,4 @@ RUN apk add --no-cache \
 
 WORKDIR /root
 
-CMD ["/usr/local/bin/vim"]
+ENTRYPOINT ["/usr/local/bin/vim"]
