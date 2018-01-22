@@ -23,7 +23,7 @@ RUN apk add --no-cache \
         acl-dev \
         libxmu-dev \
         libxpm-dev \
-        ${VIM_ENABLE_GUI:+gtk+2.0-dev} \
+        ${VIM_ENABLE_GUI:+gtk+3.0-dev} \
         ${VIM_ENABLE_PERL:+perl-dev} \
         ${VIM_ENABLE_PYTHON:+python-dev} \
         ${VIM_ENABLE_PYTHON3:+python3-dev} \
@@ -36,7 +36,7 @@ RUN apk add --no-cache \
  && cd /usr/src/vim \
  && ./configure \
         --with-features=huge \
-        ${VIM_ENABLE_GUI:+--enable-gui=gtk2} \
+        ${VIM_ENABLE_GUI:+--enable-gui=gtk3} \
         ${VIM_ENABLE_PERL:+--enable-perlinterp} \
         ${VIM_ENABLE_PYTHON:+--enable-pythoninterp} \
         ${VIM_ENABLE_PYTHON3:+--enable-python3interp} \
