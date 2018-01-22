@@ -23,7 +23,6 @@ RUN apk add --no-cache \
         acl-dev \
         libxmu-dev \
         libxpm-dev \
- # && apk add --no-cache \
         ${VIM_ENABLE_GUI:+gtk+2.0-dev} \
         ${VIM_ENABLE_PERL:+perl-dev} \
         ${VIM_ENABLE_PYTHON:+python-dev} \
