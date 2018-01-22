@@ -31,6 +31,12 @@ ex. Enables only Lua interface.
 $ docker build --build-arg 'VIM_ENABLE_ALL=' --build-arg 'VIM_ENABLE_LUA=yes' --tag 'vim:lua' .
 ```
 
+### `VIM_ENABLE_GUI`
+
+When this is not empty, GUI(gtk+3.0) is enabled.
+
+default: Follows to [`VIM_ENABLE_ALL`](#vim_enable_all)
+
 ### `VIM_ENABLE_PERL`
 
 When this is not empty, Perl interface is enabled.
