@@ -66,6 +66,7 @@ RUN apk add --no-cache \
         ${VIM_ENABLE_TCL:+-c 'verbose tcl puts "Tcl v[info patchlevel]"'} \
         -c q
 
+COPY vimrc /usr/local/share/vim/vimrc
 
 WORKDIR /root
 
