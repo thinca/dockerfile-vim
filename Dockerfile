@@ -32,9 +32,10 @@ RUN apk add --no-cache --virtual .build \
         libc-dev \
         make \
         gettext \
+        ncurses-dev \
         libxmu-dev \
  && apk add --no-cache \
-        ncurses-dev \
+        ncurses \
         acl-dev \
         libxpm-dev \
         diffutils \
