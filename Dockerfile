@@ -26,15 +26,16 @@ ARG LUA_VERSION="5.3"
 COPY --from=iconv /usr/local/include /usr/local/include/
 COPY --from=iconv /usr/local/lib /usr/local/lib/
 
-RUN apk add --no-cache \
+RUN apk add --no-cache --virtual .build \
         git \
         gcc \
         libc-dev \
         make \
         gettext \
+        libxmu-dev \
+ && apk add --no-cache \
         ncurses-dev \
         acl-dev \
-        libxmu-dev \
         libxpm-dev \
         diffutils \
         ${VIM_ENABLE_GUI:+gtk+3.0-dev} \
@@ -62,13 +63,7 @@ RUN apk add --no-cache \
  && make install \
  && cd /root \
  && rm -fr /usr/src/vim \
- && apk del --purge \
-        git \
-        gcc \
-        libc-dev \
-        make \
-        gettext \
-        libxmu-dev \
+ && apk del --purge .build \
         ${VIM_ENABLE_RUBY:+ruby} \
 # test
  && vim -es \
