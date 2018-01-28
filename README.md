@@ -23,7 +23,7 @@ $ docker build --build-arg 'VIM_VERSION=v8.0.0000' --tag 'vim:v8.0.0000' .
 When this is not empty, all supported language interfaces are enabled.
 You can overwrite by each variables.
 
-default: `yes`
+default: empty
 
 
 ex. Enables only Lua interface.
