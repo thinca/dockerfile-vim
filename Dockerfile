@@ -33,13 +33,12 @@ RUN apk add --no-cache --virtual .build \
         make \
         gettext \
         ncurses-dev \
-        libxmu-dev \
+        ${VIM_ENABLE_GUI:+gtk+3.0-dev libxmu-dev} \
  && apk add --no-cache \
         ncurses \
         acl-dev \
-        libxpm-dev \
         diffutils \
-        ${VIM_ENABLE_GUI:+gtk+3.0-dev} \
+        ${VIM_ENABLE_GUI:+gtk+3.0-dev libxpm-dev} \
         ${VIM_ENABLE_PERL:+perl-dev} \
         ${VIM_ENABLE_PYTHON:+python-dev} \
         ${VIM_ENABLE_PYTHON3:+python3-dev} \
