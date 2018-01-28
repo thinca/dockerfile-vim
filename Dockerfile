@@ -1,3 +1,13 @@
+FROM alpine:3.7 AS iconv
+
+RUN apk add --no-cache curl g++ make
+RUN curl -SL http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.15.tar.gz | tar -xz
+WORKDIR libiconv-1.15
+RUN ./configure
+RUN make
+RUN make install
+
+
 FROM alpine:3.7
 
 LABEL maintainer="thinca <thinca+vim@gmail.com>"
@@ -12,6 +22,9 @@ ARG VIM_ENABLE_RUBY="${VIM_ENABLE_ALL}"
 ARG VIM_ENABLE_LUA="${VIM_ENABLE_ALL}"
 ARG VIM_ENABLE_TCL="${VIM_ENABLE_ALL}"
 ARG LUA_VERSION="5.3"
+
+COPY --from=iconv /usr/local/include /usr/local/include/
+COPY --from=iconv /usr/local/lib /usr/local/lib/
 
 RUN apk add --no-cache \
         git \
