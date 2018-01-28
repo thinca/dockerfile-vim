@@ -1,0 +1,19 @@
+#!/bin/bash
+
+docker push "${IMAGE_NAME}-full"
+
+if [[ "${SOURCE_BRANCH}" != "master" ]]; then
+	git remote add vim https://github.com/vim/vim
+	git fetch vim master --depth 1
+	MASTER_SHA1="$(git log -1 --format=format:%H FETCH_HEAD)"
+	git fetch vim "${SOURCE_BRANCH}" --depth 1
+	SOURCE_SHA1="$(git log -1 --format=format:%H FETCH_HEAD)"
+	git log -1 "${MASTER_SHA1}"
+	git log -1 "${SOURCE_SHA1}"
+	if [[ "${MASTER_SHA1}" == "${SOURCE_SHA1}" ]]; then
+		docker tag "${IMAGE_NAME}" "${DOCKER_REPO}:latest"
+		docker push "${DOCKER_REPO}:latest"
+		docker tag "${IMAGE_NAME}-full" "${DOCKER_REPO}:latest-full"
+		docker push "${DOCKER_REPO}:latest-full"
+	fi
+fi

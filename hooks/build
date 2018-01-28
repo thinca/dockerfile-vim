@@ -1,0 +1,24 @@
+#!/bin/bash
+
+printenv
+
+vercmp() {
+	local X="${1}"
+	local Y="${2}"
+
+	local X_NORMALIZED="$(printf "%d%02d%04.0f" $(echo ${X} | tr '.' ' '))"
+	local Y_NORMALIZED="$(printf "%d%02d%04.0f" $(echo ${Y} | tr '.' ' '))"
+
+	[[ ${X_NORMALIZED} -gt ${Y_NORMALIZED} ]]
+}
+
+LUA_VERSION=5.3
+if [[ "${SOURCE_BRANCH}" == v* ]]; then
+	SOURCE_VER=${SOURCE_BRANCH#v}
+	if vercmp 7.4.093 "${SOURCE_VER}"; then
+		LUA_VERSION=5.1
+	fi
+fi
+
+docker build --build-arg "VIM_VERSION=${SOURCE_BRANCH}" --build-arg "VIM_ENABLE_ALL=" -t "${IMAGE_NAME}" .
+docker build --build-arg "VIM_VERSION=${SOURCE_BRANCH}" --build-arg "VIM_ENABLE_ALL=yes" --build-arg "LUA_VERSION=${LUA_VERSION}" -t "${IMAGE_NAME}-full" .
