@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -eu
+
 docker push "${IMAGE_NAME}-full"
 
 if [[ "${SOURCE_BRANCH}" != "master" ]]; then
