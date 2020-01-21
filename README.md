@@ -68,6 +68,12 @@ When this is not empty, Tcl interface is enabled.
 
 default: Follows to [`VIM_ENABLE_ALL`](#vim_enable_all)
 
+### `VIM_ENABLE_MZSCHEME`
+
+When this is not empty, MzScheme(Racket) interface is enabled.
+
+default: Follows to [`VIM_ENABLE_ALL`](#vim_enable_all)
+
 ### `VIM_ENABLE_LUA`
 
 When this is not empty, Lua interface is enabled.

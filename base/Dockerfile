@@ -21,12 +21,14 @@ ARG VIM_ENABLE_PYTHON3="${VIM_ENABLE_ALL}"
 ARG VIM_ENABLE_RUBY="${VIM_ENABLE_ALL}"
 ARG VIM_ENABLE_LUA="${VIM_ENABLE_ALL}"
 ARG VIM_ENABLE_TCL="${VIM_ENABLE_ALL}"
+ARG VIM_ENABLE_MZSCHEME="${VIM_ENABLE_ALL}"
 ARG LUA_VERSION="5.3"
 
 COPY --from=iconv /usr/local/include /usr/local/include/
 COPY --from=iconv /usr/local/lib /usr/local/lib/
 
-RUN ([ -z "${VIM_ENABLE_PYTHON3}" ] || echo "http://dl-cdn.alpinelinux.org/alpine/v3.10/main" >> /etc/apk/repositories) \
+RUN ([ -z "${VIM_ENABLE_MZSCHEME}" ] || echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories) \
+ && ([ -z "${VIM_ENABLE_MZSCHEME}" -a -z "${VIM_ENABLE_PYTHON3}" ] || echo "http://dl-cdn.alpinelinux.org/alpine/v3.10/main" >> /etc/apk/repositories) \
  && apk add --no-cache --virtual .build \
         git \
         gcc \
@@ -46,6 +48,8 @@ RUN ([ -z "${VIM_ENABLE_PYTHON3}" ] || echo "http://dl-cdn.alpinelinux.org/alpin
         ${VIM_ENABLE_RUBY:+ruby ruby-dev} \
         ${VIM_ENABLE_LUA:+lua${LUA_VERSION}-dev luajit-dev} \
         ${VIM_ENABLE_TCL:+tcl-dev} \
+        ${VIM_ENABLE_MZSCHEME:+racket-dev} \
+ && ([ -z "${VIM_ENABLE_MZSCHEME}" ] || raco pkg install --batch --auto cext-lib) \
  && git -c advice.detachedHead=false \
         clone --quiet --depth 1 --branch "${VIM_VERSION}" \
         https://github.com/vim/vim.git /usr/src/vim \
@@ -59,6 +63,7 @@ RUN ([ -z "${VIM_ENABLE_PYTHON3}" ] || echo "http://dl-cdn.alpinelinux.org/alpin
         ${VIM_ENABLE_RUBY:+--enable-rubyinterp} \
         ${VIM_ENABLE_LUA:+--enable-luainterp --with-luajit} \
         ${VIM_ENABLE_TCL:+--enable-tclinterp} \
+        ${VIM_ENABLE_MZSCHEME:+--enable-mzschemeinterp --with-plthome=/usr} \
         --enable-fail-if-missing \
  && make \
  && make install \
@@ -74,6 +79,7 @@ RUN ([ -z "${VIM_ENABLE_PYTHON3}" ] || echo "http://dl-cdn.alpinelinux.org/alpin
         ${VIM_ENABLE_RUBY:+-c 'verbose ruby puts "Ruby v#{RUBY_VERSION}"'} \
         ${VIM_ENABLE_LUA:+-c 'verbose lua print(_VERSION)'} \
         ${VIM_ENABLE_TCL:+-c 'verbose tcl puts "Tcl v[info patchlevel]"'} \
+        ${VIM_ENABLE_MZSCHEME:+-c 'verbose mzscheme (string-append "Racket v" (version))'} \
         -c q
 
 COPY vimrc /usr/local/share/vim/vimrc
