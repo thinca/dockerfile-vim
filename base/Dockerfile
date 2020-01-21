@@ -36,19 +36,27 @@ RUN ([ -z "${VIM_ENABLE_MZSCHEME}" ] || echo "http://dl-cdn.alpinelinux.org/alpi
         make \
         gettext \
         ncurses-dev \
-        ${VIM_ENABLE_GUI:+gtk+3.0-dev libxmu-dev} \
- && apk add --no-cache \
-        ncurses \
         acl-dev \
-        diffutils \
         ${VIM_ENABLE_GUI:+gtk+3.0-dev libxpm-dev} \
         ${VIM_ENABLE_PERL:+perl-dev} \
-        ${VIM_ENABLE_PYTHON:+python-dev} \
+        ${VIM_ENABLE_PYTHON:+python2-dev} \
         ${VIM_ENABLE_PYTHON3:+python3-dev=3.7.5-r1} \
-        ${VIM_ENABLE_RUBY:+ruby ruby-dev} \
-        ${VIM_ENABLE_LUA:+lua${LUA_VERSION}-dev luajit-dev} \
+        ${VIM_ENABLE_RUBY:+ruby-dev} \
         ${VIM_ENABLE_TCL:+tcl-dev} \
+        ${VIM_ENABLE_LUA:+lua${LUA_VERSION}-dev luajit-dev} \
         ${VIM_ENABLE_MZSCHEME:+racket-dev} \
+ && apk add --no-cache \
+        ncurses \
+        acl \
+        diffutils \
+        ${VIM_ENABLE_GUI:+gtk+3.0 libxpm} \
+        ${VIM_ENABLE_PERL:+perl} \
+        ${VIM_ENABLE_PYTHON:+python2} \
+        ${VIM_ENABLE_PYTHON3:+python3=3.7.5-r1} \
+        ${VIM_ENABLE_RUBY:+ruby} \
+        ${VIM_ENABLE_LUA:+lua${LUA_VERSION} luajit} \
+        ${VIM_ENABLE_TCL:+tcl} \
+        ${VIM_ENABLE_MZSCHEME:+racket} \
  && ([ -z "${VIM_ENABLE_MZSCHEME}" ] || raco pkg install --batch --auto cext-lib) \
  && git -c advice.detachedHead=false \
         clone --quiet --depth 1 --branch "${VIM_VERSION}" \
@@ -69,8 +77,7 @@ RUN ([ -z "${VIM_ENABLE_MZSCHEME}" ] || echo "http://dl-cdn.alpinelinux.org/alpi
  && make install \
  && cd /root \
  && rm -fr /usr/src/vim \
- && apk del --purge .build \
-        ${VIM_ENABLE_RUBY:+ruby} \
+ && apk del --no-cache --purge .build \
 # test
  && vim -es \
         ${VIM_ENABLE_PERL:+-c 'verbose perl print("Perl $^V")'} \
