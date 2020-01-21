@@ -1,4 +1,4 @@
-FROM alpine:3.7 AS iconv
+FROM alpine:3.11 AS iconv
 
 RUN apk add --no-cache curl g++ make
 RUN curl -SL http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.16.tar.gz | tar -xz
@@ -8,7 +8,7 @@ RUN make
 RUN make install
 
 
-FROM alpine:3.7
+FROM alpine:3.11
 
 LABEL maintainer="thinca <thinca+vim@gmail.com>"
 
@@ -26,7 +26,8 @@ ARG LUA_VERSION="5.3"
 COPY --from=iconv /usr/local/include /usr/local/include/
 COPY --from=iconv /usr/local/lib /usr/local/lib/
 
-RUN apk add --no-cache --virtual .build \
+RUN ([ -z "${VIM_ENABLE_PYTHON3}" ] || echo "http://dl-cdn.alpinelinux.org/alpine/v3.10/main" >> /etc/apk/repositories) \
+ && apk add --no-cache --virtual .build \
         git \
         gcc \
         libc-dev \
@@ -41,7 +42,7 @@ RUN apk add --no-cache --virtual .build \
         ${VIM_ENABLE_GUI:+gtk+3.0-dev libxpm-dev} \
         ${VIM_ENABLE_PERL:+perl-dev} \
         ${VIM_ENABLE_PYTHON:+python-dev} \
-        ${VIM_ENABLE_PYTHON3:+python3-dev} \
+        ${VIM_ENABLE_PYTHON3:+python3-dev=3.7.5-r1} \
         ${VIM_ENABLE_RUBY:+ruby ruby-dev} \
         ${VIM_ENABLE_LUA:+lua${LUA_VERSION}-dev luajit-dev} \
         ${VIM_ENABLE_TCL:+tcl-dev} \
