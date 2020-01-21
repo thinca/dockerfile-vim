@@ -1,8 +1,8 @@
 FROM alpine:3.7 AS iconv
 
 RUN apk add --no-cache curl g++ make
-RUN curl -SL http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.15.tar.gz | tar -xz
-WORKDIR libiconv-1.15
+RUN curl -SL http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.16.tar.gz | tar -xz
+WORKDIR libiconv-1.16
 RUN ./configure
 RUN make
 RUN make install
