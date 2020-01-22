@@ -8,9 +8,7 @@ RUN make
 RUN make install
 
 
-FROM alpine:3.11
-
-LABEL maintainer="thinca <thinca+vim@gmail.com>"
+FROM alpine:3.11 AS base
 
 ARG VIM_VERSION=master
 ARG VIM_ENABLE_ALL=""
@@ -24,12 +22,25 @@ ARG VIM_ENABLE_TCL="${VIM_ENABLE_ALL}"
 ARG VIM_ENABLE_MZSCHEME="${VIM_ENABLE_ALL}"
 ARG LUA_VERSION="5.3"
 
-COPY --from=iconv /usr/local/include /usr/local/include/
-COPY --from=iconv /usr/local/lib /usr/local/lib/
-
 RUN ([ -z "${VIM_ENABLE_MZSCHEME}" ] || echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories) \
  && ([ -z "${VIM_ENABLE_MZSCHEME}" -a -z "${VIM_ENABLE_PYTHON3}" ] || echo "http://dl-cdn.alpinelinux.org/alpine/v3.10/main" >> /etc/apk/repositories) \
- && apk add --no-cache --virtual .build \
+ && apk add --no-cache \
+        ncurses \
+        acl \
+        diffutils \
+        ${VIM_ENABLE_GUI:+gtk+3.0 libxpm} \
+        ${VIM_ENABLE_PERL:+perl} \
+        ${VIM_ENABLE_PYTHON:+python2} \
+        ${VIM_ENABLE_PYTHON3:+python3=3.7.5-r1} \
+        ${VIM_ENABLE_RUBY:+ruby} \
+        ${VIM_ENABLE_LUA:+lua${LUA_VERSION} luajit} \
+        ${VIM_ENABLE_TCL:+tcl} \
+        ${VIM_ENABLE_MZSCHEME:+racket}
+
+
+FROM base AS build
+
+RUN apk add \
         git \
         gcc \
         libc-dev \
@@ -44,25 +55,13 @@ RUN ([ -z "${VIM_ENABLE_MZSCHEME}" ] || echo "http://dl-cdn.alpinelinux.org/alpi
         ${VIM_ENABLE_RUBY:+ruby-dev} \
         ${VIM_ENABLE_TCL:+tcl-dev} \
         ${VIM_ENABLE_LUA:+lua${LUA_VERSION}-dev luajit-dev} \
-        ${VIM_ENABLE_MZSCHEME:+racket-dev} \
- && apk add --no-cache \
-        ncurses \
-        acl \
-        diffutils \
-        ${VIM_ENABLE_GUI:+gtk+3.0 libxpm} \
-        ${VIM_ENABLE_PERL:+perl} \
-        ${VIM_ENABLE_PYTHON:+python2} \
-        ${VIM_ENABLE_PYTHON3:+python3=3.7.5-r1} \
-        ${VIM_ENABLE_RUBY:+ruby} \
-        ${VIM_ENABLE_LUA:+lua${LUA_VERSION} luajit} \
-        ${VIM_ENABLE_TCL:+tcl} \
-        ${VIM_ENABLE_MZSCHEME:+racket} \
- && ([ -z "${VIM_ENABLE_MZSCHEME}" ] || raco pkg install --batch --auto cext-lib) \
- && git -c advice.detachedHead=false \
+        ${VIM_ENABLE_MZSCHEME:+racket-dev}
+RUN [ -z "${VIM_ENABLE_MZSCHEME}" ] || raco pkg install --batch --auto cext-lib
+RUN git -c advice.detachedHead=false \
         clone --quiet --depth 1 --branch "${VIM_VERSION}" \
-        https://github.com/vim/vim.git /usr/src/vim \
- && cd /usr/src/vim \
- && ./configure \
+        https://github.com/vim/vim.git /usr/src/vim
+WORKDIR /usr/src/vim
+RUN ./configure \
         --with-features=huge \
         ${VIM_ENABLE_GUI:+--enable-gui=gtk3} \
         ${VIM_ENABLE_PERL:+--enable-perlinterp} \
@@ -72,14 +71,22 @@ RUN ([ -z "${VIM_ENABLE_MZSCHEME}" ] || echo "http://dl-cdn.alpinelinux.org/alpi
         ${VIM_ENABLE_LUA:+--enable-luainterp --with-luajit} \
         ${VIM_ENABLE_TCL:+--enable-tclinterp} \
         ${VIM_ENABLE_MZSCHEME:+--enable-mzschemeinterp --with-plthome=/usr} \
-        --enable-fail-if-missing \
- && make \
- && make install \
- && cd /root \
- && rm -fr /usr/src/vim \
- && apk del --no-cache --purge .build \
+        --enable-fail-if-missing
+RUN make
+RUN mv /usr/local /usr/local_bak
+RUN make install
+
+
+FROM base AS release
+
+LABEL maintainer="thinca <thinca+vim@gmail.com>"
+
+COPY --from=build /usr/local /usr/local/
+COPY --from=iconv /usr/local/include /usr/local/include/
+COPY --from=iconv /usr/local/lib /usr/local/lib/
+
 # test
- && vim -es \
+RUN vim -es \
         -c 'verbose echo "----- Running Test -----"' \
         ${VIM_ENABLE_PERL:+-c 'verbose perl print("Perl $^V")'} \
         ${VIM_ENABLE_PYTHON:+-c 'verbose python import platform;print("Python v" + platform.python_version())'} \
