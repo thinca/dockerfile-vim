@@ -98,8 +98,6 @@ RUN vim -es \
         -c 'verbose echo "----- Finish Test -----\n"' \
         -c q
 
-COPY vimrc /usr/local/share/vim/vimrc
-
 WORKDIR /root
 
 ENTRYPOINT ["/usr/local/bin/vim"]

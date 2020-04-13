@@ -6,6 +6,16 @@ Latest Vim from [vim/vim](https://github.com/vim/vim).
 $ docker run --rm -it thinca/vim
 ```
 
+## Workaround for terminal size problem
+
+Sometimes terminal size is broken.  (Maybe, Docker sets terminal size too late)
+Here is a workaround to this problem.
+
+```
+$ docker run --rm -it -e COLUMNS="$(tput cols)" -e LINES="$(tput lines)" thinca/vim
+```
+
+
 ## Build Arguments
 
 ### `VIM_VERSION`
