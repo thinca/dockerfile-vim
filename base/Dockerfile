@@ -1,8 +1,8 @@
 FROM alpine:3.11 AS iconv
 
-RUN apk add --no-cache curl g++ make
-RUN curl -SL http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.16.tar.gz | tar -xz
-WORKDIR libiconv-1.16
+RUN apk add --no-cache g++ make
+RUN wget --quiet --output-document - http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.16.tar.gz | \
+        tar -xz --strip-components=1
 RUN ./configure
 RUN make
 RUN make install
@@ -41,7 +41,6 @@ RUN ([ -z "${VIM_ENABLE_MZSCHEME}" ] || echo "http://dl-cdn.alpinelinux.org/alpi
 FROM base AS build
 
 RUN apk add \
-        git \
         gcc \
         libc-dev \
         make \
@@ -57,9 +56,10 @@ RUN apk add \
         ${VIM_ENABLE_LUA:+lua${LUA_VERSION}-dev luajit-dev} \
         ${VIM_ENABLE_MZSCHEME:+racket-dev}
 RUN [ -z "${VIM_ENABLE_MZSCHEME}" ] || raco pkg install --batch --auto cext-lib
-RUN git -c advice.detachedHead=false \
-        clone --quiet --depth 1 --branch "${VIM_VERSION}" \
-        https://github.com/vim/vim.git /usr/src/vim
+RUN mkdir -p /usr/src/vim
+RUN wget --quiet --output-document - \
+        "https://github.com/vim/vim/archive/${VIM_VERSION}.tar.gz" | \
+        tar xz --directory=/usr/src/vim --strip-components=1
 WORKDIR /usr/src/vim
 RUN ./configure \
         --with-features=huge \
