@@ -6,6 +6,7 @@ Latest Vim from [vim/vim](https://github.com/vim/vim).
 $ docker run --rm -it thinca/vim
 ```
 
+
 ## Workaround for terminal size problem
 
 Sometimes terminal size is broken.  (Maybe, Docker sets terminal size too late)
@@ -28,9 +29,10 @@ default: `master`
 $ docker build --build-arg 'VIM_VERSION=v8.0.0000' --tag 'vim:v8.0.0000' .
 ```
 
+
 ### `VIM_ENABLE_ALL`
 
-When this is not empty, all supported language interfaces are enabled.
+When this is not empty, all supported language interfaces and GUI feature are enabled.
 You can overwrite by each variables.
 
 default: empty
@@ -41,17 +43,25 @@ ex. Enables only Lua interface.
 $ docker build --build-arg 'VIM_ENABLE_ALL=' --build-arg 'VIM_ENABLE_LUA=yes' --tag 'vim:lua' .
 ```
 
+ex. Enables all but Python interface.
+```
+$ docker build --build-arg 'VIM_ENABLE_ALL=yes' --build-arg 'VIM_ENABLE_PYTHON=' --tag 'vim:all-without-python' .
+```
+
+
 ### `VIM_ENABLE_GUI`
 
 When this is not empty, GUI(gtk+3.0) is enabled.
 
 default: Follows to [`VIM_ENABLE_ALL`](#vim_enable_all)
 
+
 ### `VIM_ENABLE_PERL`
 
 When this is not empty, Perl interface is enabled.
 
 default: Follows to [`VIM_ENABLE_ALL`](#vim_enable_all)
+
 
 ### `VIM_ENABLE_PYTHON`
 
@@ -60,11 +70,13 @@ Here, "Python" means "Python 2.x".
 
 default: Follows to [`VIM_ENABLE_ALL`](#vim_enable_all)
 
+
 ### `VIM_ENABLE_PYTHON3`
 
 When this is not empty, Python3 interface is enabled.
 
 default: Follows to [`VIM_ENABLE_ALL`](#vim_enable_all)
+
 
 ### `VIM_ENABLE_RUBY`
 
@@ -72,11 +84,13 @@ When this is not empty, Ruby interface is enabled.
 
 default: Follows to [`VIM_ENABLE_ALL`](#vim_enable_all)
 
+
 ### `VIM_ENABLE_TCL`
 
 When this is not empty, Tcl interface is enabled.
 
 default: Follows to [`VIM_ENABLE_ALL`](#vim_enable_all)
+
 
 ### `VIM_ENABLE_MZSCHEME`
 
@@ -84,11 +98,13 @@ When this is not empty, MzScheme(Racket) interface is enabled.
 
 default: Follows to [`VIM_ENABLE_ALL`](#vim_enable_all)
 
+
 ### `VIM_ENABLE_LUA`
 
 When this is not empty, Lua interface is enabled.
 
 default: Follows to [`VIM_ENABLE_ALL`](#vim_enable_all)
+
 
 ### `LUA_VERSION`
 
@@ -100,6 +116,7 @@ default: `5.3`
 ```
 $ docker build --build-arg 'VIM_VERSION=v7.4.092' --build-arg 'LUA_VERSION=5.1' --tag 'vim:v7.4.092' .
 ```
+
 
 ### `VIM_COMPILEDBY`
 
