@@ -21,6 +21,7 @@ ARG VIM_ENABLE_LUA="${VIM_ENABLE_ALL}"
 ARG VIM_ENABLE_TCL="${VIM_ENABLE_ALL}"
 ARG VIM_ENABLE_MZSCHEME="${VIM_ENABLE_ALL}"
 ARG LUA_VERSION="5.3"
+ARG VIM_COMPILEDBY=""
 
 RUN ([ -z "${VIM_ENABLE_MZSCHEME}" ] || echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories) \
  && ([ -z "${VIM_ENABLE_MZSCHEME}" -a -z "${VIM_ENABLE_PYTHON3}" ] || echo "http://dl-cdn.alpinelinux.org/alpine/v3.10/main" >> /etc/apk/repositories) \
@@ -63,6 +64,7 @@ RUN wget --quiet --output-document - \
 WORKDIR /usr/src/vim
 RUN ./configure \
         --with-features=huge \
+        --with-compiledby="${VIM_COMPILEDBY}" \
         ${VIM_ENABLE_GUI:+--enable-gui=gtk3} \
         ${VIM_ENABLE_PERL:+--enable-perlinterp} \
         ${VIM_ENABLE_PYTHON:+--enable-pythoninterp} \

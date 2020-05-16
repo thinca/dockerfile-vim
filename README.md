@@ -101,6 +101,11 @@ default: `5.3`
 $ docker build --build-arg 'VIM_VERSION=v7.4.092' --build-arg 'LUA_VERSION=5.1' --tag 'vim:v7.4.092' .
 ```
 
+### `VIM_COMPILEDBY`
+
+Set to `--with-compiedby` configure option.
+
+
 ## LICENSE
 
 [zlib License](LICENSE.txt)
