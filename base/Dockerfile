@@ -1,4 +1,4 @@
-FROM alpine:3.11 AS iconv
+FROM alpine:3.12 AS iconv
 
 RUN apk add --no-cache g++ make
 RUN wget --quiet --output-document - http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.16.tar.gz | \
@@ -8,7 +8,7 @@ RUN make
 RUN make install
 
 
-FROM alpine:3.11 AS base
+FROM alpine:3.12 AS base
 
 ARG VIM_VERSION=master
 ARG VIM_ENABLE_ALL=""
