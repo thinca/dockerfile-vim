@@ -78,6 +78,21 @@ When this is not empty, Python3 interface is enabled.
 default: Follows to [`VIM_ENABLE_ALL`](#vim_enable_all)
 
 
+### `PYTHON3_VERSION`
+
+A version of Python 3.
+
+You can only specify `3.7` or empty.
+`3.8` is used when this is empty.
+
+Vim built with Python 2.x and Python 3.8 is only available either `if_python` or `if_python3`.
+
+You should specify `3.7` to enable both in same time.
+But, unfortunately, you can not enable `if_mzscheme` in this case.
+
+default: empty
+
+
 ### `VIM_ENABLE_RUBY`
 
 When this is not empty, Ruby interface is enabled.

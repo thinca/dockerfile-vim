@@ -21,10 +21,15 @@ ARG VIM_ENABLE_LUA="${VIM_ENABLE_ALL}"
 ARG VIM_ENABLE_TCL="${VIM_ENABLE_ALL}"
 ARG VIM_ENABLE_MZSCHEME="${VIM_ENABLE_ALL}"
 ARG LUA_VERSION="5.3"
+ARG PYTHON3_VERSION=""
 ARG VIM_COMPILEDBY=""
 
-RUN ([ -z "${VIM_ENABLE_MZSCHEME}" ] || echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories) \
- && ([ -z "${VIM_ENABLE_MZSCHEME}" -a -z "${VIM_ENABLE_PYTHON3}" ] || echo "http://dl-cdn.alpinelinux.org/alpine/v3.10/main" >> /etc/apk/repositories) \
+RUN { [ -z "${VIM_ENABLE_MZSCHEME}" ] || \
+    { echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories; \
+      echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories; }; } \
+ && { [ -z "${VIM_ENABLE_PYTHON3}" -o "v${PYTHON3_VERSION}" != "v3.7" ] || \
+      { echo "http://dl-cdn.alpinelinux.org/alpine/v3.10/main" >> /etc/apk/repositories; \
+      PYTHON3_VERSION_DETAIL="=3.7.5-r1"; }; } \
  && apk add --no-cache \
         ncurses \
         acl \
@@ -32,7 +37,7 @@ RUN ([ -z "${VIM_ENABLE_MZSCHEME}" ] || echo "http://dl-cdn.alpinelinux.org/alpi
         ${VIM_ENABLE_GUI:+gtk+3.0 libxpm} \
         ${VIM_ENABLE_PERL:+perl} \
         ${VIM_ENABLE_PYTHON:+python2} \
-        ${VIM_ENABLE_PYTHON3:+python3=3.7.5-r1} \
+        ${VIM_ENABLE_PYTHON3:+python3${PYTHON3_VERSION_DETAIL}} \
         ${VIM_ENABLE_RUBY:+ruby} \
         ${VIM_ENABLE_LUA:+lua${LUA_VERSION} luajit} \
         ${VIM_ENABLE_TCL:+tcl} \
@@ -51,7 +56,7 @@ RUN apk add \
         ${VIM_ENABLE_GUI:+gtk+3.0-dev libxpm-dev} \
         ${VIM_ENABLE_PERL:+perl-dev} \
         ${VIM_ENABLE_PYTHON:+python2-dev} \
-        ${VIM_ENABLE_PYTHON3:+python3-dev=3.7.5-r1} \
+        ${VIM_ENABLE_PYTHON3:+python3-dev} \
         ${VIM_ENABLE_RUBY:+ruby-dev} \
         ${VIM_ENABLE_TCL:+tcl-dev} \
         ${VIM_ENABLE_LUA:+lua${LUA_VERSION}-dev luajit-dev} \
