@@ -92,19 +92,6 @@ COPY --from=build /usr/local /usr/local/
 COPY --from=iconv /usr/local/include /usr/local/include/
 COPY --from=iconv /usr/local/lib /usr/local/lib/
 
-# test
-RUN vim -es \
-        -c 'verbose echo "----- Running Test -----"' \
-        ${VIM_ENABLE_PERL:+-c 'verbose perl print("Perl $^V")'} \
-        ${VIM_ENABLE_PYTHON:+-c 'verbose python import platform;print("Python v" + platform.python_version())'} \
-        ${VIM_ENABLE_PYTHON3:+-c 'verbose python3 import platform;print("Python3 v" + platform.python_version())'} \
-        ${VIM_ENABLE_RUBY:+-c 'verbose ruby puts "Ruby v#{RUBY_VERSION}"'} \
-        ${VIM_ENABLE_LUA:+-c 'verbose lua print(_VERSION)'} \
-        ${VIM_ENABLE_TCL:+-c 'verbose tcl puts "Tcl v[info patchlevel]"'} \
-        ${VIM_ENABLE_MZSCHEME:+-c 'verbose mzscheme (string-append "Racket v" (version))'} \
-        -c 'verbose echo "----- Finish Test -----\n"' \
-        -c q
-
 WORKDIR /root
 
 ENTRYPOINT ["/usr/local/bin/vim"]
