@@ -10,7 +10,6 @@ RUN make install
 
 FROM alpine:3.12 AS base
 
-ARG VIM_VERSION=master
 ARG VIM_ENABLE_ALL=""
 ARG VIM_ENABLE_GUI="${VIM_ENABLE_ALL}"
 ARG VIM_ENABLE_PERL="${VIM_ENABLE_ALL}"
@@ -22,7 +21,6 @@ ARG VIM_ENABLE_TCL="${VIM_ENABLE_ALL}"
 ARG VIM_ENABLE_MZSCHEME="${VIM_ENABLE_ALL}"
 ARG LUA_VERSION="5.3"
 ARG PYTHON3_VERSION=""
-ARG VIM_COMPILEDBY=""
 
 RUN { [ -z "${VIM_ENABLE_MZSCHEME}" ] || \
     { echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories; \
@@ -44,7 +42,7 @@ RUN { [ -z "${VIM_ENABLE_MZSCHEME}" ] || \
         ${VIM_ENABLE_MZSCHEME:+racket}
 
 
-FROM base AS build
+FROM base AS prepare
 
 RUN apk add \
         gcc \
@@ -63,6 +61,13 @@ RUN apk add \
         ${VIM_ENABLE_MZSCHEME:+racket-dev}
 RUN [ -z "${VIM_ENABLE_MZSCHEME}" ] || raco pkg install --batch --auto cext-lib
 RUN mkdir -p /usr/src/vim
+
+
+FROM prepare AS build
+
+ARG VIM_VERSION=master
+ARG VIM_COMPILEDBY=""
+
 RUN wget --quiet --output-document - \
         "https://github.com/vim/vim/archive/${VIM_VERSION}.tar.gz" | \
         tar xz --directory=/usr/src/vim --strip-components=1
