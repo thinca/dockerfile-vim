@@ -1,0 +1,132 @@
+name: 'Docker Build'
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      vim_version:
+        description: 'Target version of Vim'
+        required: true
+
+jobs:
+  build-and-push:
+    name: 'Build ${{ matrix.image_type }} docker image and push'
+    strategy:
+      matrix:
+        image_type: ['minimum', 'full']
+      fail-fast: false
+    runs-on: 'ubuntu-latest'
+    env:
+      CACHE_IMAGE_NAME: 'thinca/vim'
+      RELEASE_IMAGE_NAME: 'thinca/vim'
+    steps:
+      - name: 'Prepare variables'
+        run: |
+          vercmp() {
+            local X="${1}"
+            local Y="${2}"
+
+            local X_NORMALIZED="$(printf "%d%02d%04.0f" $(echo ${X} | tr '.' ' '))"
+            local Y_NORMALIZED="$(printf "%d%02d%04.0f" $(echo ${Y} | tr '.' ' '))"
+
+            [[ ${X_NORMALIZED} -gt ${Y_NORMALIZED} ]]
+          }
+
+          INPUT_REF='${{ github.event.inputs.vim_version }}'
+          : ${INPUT_REF:=${GITHUB_REF}}
+          ORIGINAL_TAG=${INPUT_REF##*/}
+          VIM_VERSION=${ORIGINAL_TAG%+*}
+
+          LUA_VERSION=5.3
+          if vercmp 7.4.093 "${VIM_VERSION#v}"; then
+            LUA_VERSION=5.1
+          fi
+
+          prepare_type=
+          full=
+          if [[ '${{ matrix.image_type }}' = 'full' ]]; then
+            prepare_type="-full-lua${LUA_VERSION}"
+            full="-full"
+          fi
+
+          echo "::set-env name=VIM_VERSION::${VIM_VERSION}"
+          echo "::set-env name=LUA_VERSION::${LUA_VERSION}"
+          echo "::set-env name=CACHE_IMAGE_ICONV::${CACHE_IMAGE_NAME}:stage-cache-iconv"
+          echo "::set-env name=CACHE_IMAGE_PREPARE::${CACHE_IMAGE_NAME}:stage-cache-prepare${prepare_type}"
+          echo "::set-env name=RELEASE_IMAGE::${RELEASE_IMAGE_NAME}:${VIM_VERSION}${full}"
+          echo "::set-env name=LATEST_IMAGE::${RELEASE_IMAGE_NAME}:latest${full}"
+      - uses: 'actions/checkout@v2'
+      - name: 'Build'
+        env:
+          DOCKER_BUILDKIT: '1'
+        run: |
+          docker login --username '${{ secrets.DOCKER_HUB_USER }}' --password '${{ secrets.DOCKER_HUB_TOKEN }}'
+
+          build() {
+            local target=$1
+            local cache_from=
+            if [[ -n "$2" ]]; then
+              cache_from="--cache-from=$2"
+            fi
+            echo "-- build ${target} --"
+            docker build \
+              --tag "vim:${target}" \
+              --target "${target}" \
+              ${cache_from} \
+              --build-arg BUILDKIT_INLINE_CACHE=1 \
+              --build-arg "VIM_VERSION=${VIM_VERSION}" \
+              --build-arg "LUA_VERSION=${LUA_VERSION}" \
+              --build-arg "VIM_ENABLE_ALL=${{ matrix.image_type == 'full' && 'yes' || '' }}" \
+              --build-arg "VIM_COMPILEDBY=Docker <https://github.com/thinca/dockerfile-vim>" \
+              --progress plain \
+              ./base
+          }
+
+          build iconv "${CACHE_IMAGE_ICONV}"
+          build prepare "${CACHE_IMAGE_PREPARE}"
+          build release
+
+      - name: 'Push'
+        run: |
+          docker tag vim:iconv "${CACHE_IMAGE_ICONV}"
+          docker push "${CACHE_IMAGE_ICONV}"
+
+          docker tag vim:prepare "${CACHE_IMAGE_PREPARE}"
+          docker push "${CACHE_IMAGE_PREPARE}"
+
+          docker tag vim:release "${RELEASE_IMAGE}"
+          docker push "${RELEASE_IMAGE}"
+
+          # Push latest tag when the target version is head.
+          vim-sha() {
+            wget --method=GET \
+            --quiet --content-on-error \
+            --output-document=- \
+            --header 'Accept: application/vnd.github.v3+json' \
+            --header 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+            "https://api.github.com/repos/vim/vim/git/refs/${1}" | jq -r '.object.sha'
+          }
+
+          target_sha=$(vim-sha tags/${VIM_VERSION})
+          echo "target_sha: ${target_sha}"
+          master_sha=$(vim-sha heads/master)
+          echo "master_sha: ${master_sha}"
+          if [[ "${target_sha}" != "null" && "${target_sha}" == "${master_sha}" ]]; then
+            docker tag vim:release "${LATEST_IMAGE}"
+            docker push "${LATEST_IMAGE}"
+          fi
+
+  delete-tag:
+    name: 'Delete processed tag'
+    needs: 'build-and-push'
+    runs-on: 'ubuntu-latest'
+    if: "always() && startsWith(github.ref, 'refs/tags/v')"
+    steps:
+      - run: |
+          wget --method=DELETE \
+          --quiet --content-on-error \
+          --output-document=- \
+          --header 'Accept: application/vnd.github.v3+json' \
+          --header 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+          'https://api.github.com/repos/${{ github.repository }}/git/${{ github.ref }}'
