@@ -48,6 +48,9 @@ ex. Enables all but Python interface.
 $ docker build --build-arg 'VIM_ENABLE_ALL=yes' --build-arg 'VIM_ENABLE_PYTHON=' --tag 'vim:all-without-python' .
 ```
 
+NOTE: The older Vim can not build with some latest version of language interfaces.
+Because sometimes the language is updated with breaking changes, and Vim followed to them in newer version.
+
 
 ### `VIM_ENABLE_GUI`
 
