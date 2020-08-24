@@ -19,6 +19,13 @@ $ docker run --rm -it -e COLUMNS="$(tput cols)" -e LINES="$(tput lines)" thinca/
 
 ## Build Arguments
 
+Note: Buildkit is required to build this image:
+
+```shell
+$ export DOCKER_BUILDKIT=1
+```
+
+
 ### `VIM_VERSION`
 
 A Git commit reference in [Vim repository](https://github.com/vim/vim). e.g. tag name `v8.0.0000` or commit hash `df980db6`
