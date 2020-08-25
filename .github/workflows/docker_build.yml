@@ -20,6 +20,7 @@ jobs:
     env:
       CACHE_IMAGE_NAME: 'thinca/vim'
       RELEASE_IMAGE_NAME: 'thinca/vim'
+      GITHUB_PKG_REPOSITORY: 'thinca/vim'
     steps:
       - name: 'Prepare variables'
         run: |
@@ -56,6 +57,10 @@ jobs:
           echo "::set-env name=CACHE_IMAGE_PREPARE::${CACHE_IMAGE_NAME}:stage-cache-prepare${prepare_type}"
           echo "::set-env name=RELEASE_IMAGE::${RELEASE_IMAGE_NAME}:${VIM_VERSION}${full}"
           echo "::set-env name=LATEST_IMAGE::${RELEASE_IMAGE_NAME}:latest${full}"
+
+          github_image_name="docker.pkg.github.com/${GITHUB_PKG_REPOSITORY}/vim"
+          echo "::set-env name=GITHUB_RELEASE_IMAGE::${github_image_name}:${VIM_VERSION}${full}"
+          echo "::set-env name=GITHUB_LATEST_IMAGE::${github_image_name}:latest${full}"
       - uses: 'actions/checkout@v2'
       - name: 'Build'
         env:
@@ -98,6 +103,13 @@ jobs:
           docker tag vim:release "${RELEASE_IMAGE}"
           docker push "${RELEASE_IMAGE}"
 
+          docker tag vim:release "${RELEASE_IMAGE}"
+          docker push "${RELEASE_IMAGE}"
+
+          docker login docker.pkg.github.com --username '${{ github.repository_owner }}' --password '${{ secrets.PERSONAL_ACCESS_TOKEN_GITHUB }}'
+          docker tag vim:release "${GITHUB_RELEASE_IMAGE}"
+          docker push "${GITHUB_RELEASE_IMAGE}"
+
           # Push latest tag when the target version is head.
           vim-sha() {
             wget --method=GET \
@@ -115,6 +127,8 @@ jobs:
           if [[ "${target_sha}" != "null" && "${target_sha}" == "${master_sha}" ]]; then
             docker tag vim:release "${LATEST_IMAGE}"
             docker push "${LATEST_IMAGE}"
+            docker tag vim:release "${GITHUB_LATEST_IMAGE}"
+            docker push "${GITHUB_LATEST_IMAGE}"
           fi
 
   delete-tag:
