@@ -78,7 +78,7 @@ RUN wget --quiet --output-document - \
 WORKDIR /usr/src/vim
 RUN ./configure \
         --with-features=huge \
-        --with-compiledby="${VIM_COMPILEDBY}" \
+        ${VIM_COMPILEDBY:+--with-compiledby="${VIM_COMPILEDBY}"} \
         ${VIM_ENABLE_GUI:+--enable-gui=gtk3} \
         ${VIM_ENABLE_PERL:+--enable-perlinterp} \
         ${VIM_ENABLE_PYTHON:+--enable-pythoninterp} \
