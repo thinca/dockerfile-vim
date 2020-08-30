@@ -32,6 +32,7 @@ RUN { [ -z "${VIM_ENABLE_MZSCHEME}" ] || \
         ncurses \
         acl \
         diffutils \
+        gettext \
         ${VIM_ENABLE_GUI:+gtk+3.0 libxpm} \
         ${VIM_ENABLE_PERL:+perl} \
         ${VIM_ENABLE_PYTHON:+python2} \
@@ -48,7 +49,7 @@ RUN apk add \
         gcc \
         libc-dev \
         make \
-        gettext \
+        gettext-dev \
         ncurses-dev \
         acl-dev \
         ${VIM_ENABLE_GUI:+gtk+3.0-dev libxpm-dev} \
