@@ -39,7 +39,7 @@ $ docker build --build-arg 'VIM_VERSION=v8.0.0000' --tag 'vim:v8.0.0000' .
 
 ### `VIM_ENABLE_ALL`
 
-When this is not empty, all supported language interfaces and GUI feature are enabled.
+When this is not empty, all other `VIM_ENABLE_XXX` flags are enabled.
 You can overwrite by each variables.
 
 default: empty
@@ -62,6 +62,13 @@ Because sometimes the language is updated with breaking changes, and Vim followe
 ### `VIM_ENABLE_GUI`
 
 When this is not empty, GUI(gtk+3.0) is enabled.
+
+default: Follows to [`VIM_ENABLE_ALL`](#vim_enable_all)
+
+
+### `VIM_ENABLE_SOUND`
+
+When this is not empty, `+sound` is enabled.
 
 default: Follows to [`VIM_ENABLE_ALL`](#vim_enable_all)
 

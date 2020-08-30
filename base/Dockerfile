@@ -12,6 +12,7 @@ FROM alpine:3.12 AS base
 
 ARG VIM_ENABLE_ALL=""
 ARG VIM_ENABLE_GUI="${VIM_ENABLE_ALL}"
+ARG VIM_ENABLE_SOUND="${VIM_ENABLE_ALL}"
 ARG VIM_ENABLE_PERL="${VIM_ENABLE_ALL}"
 ARG VIM_ENABLE_PYTHON="${VIM_ENABLE_ALL}"
 ARG VIM_ENABLE_PYTHON3="${VIM_ENABLE_ALL}"
@@ -34,6 +35,7 @@ RUN { [ -z "${VIM_ENABLE_MZSCHEME}" ] || \
         diffutils \
         gettext \
         ${VIM_ENABLE_GUI:+gtk+3.0 libxmu libxpm} \
+        ${VIM_ENABLE_SOUND:+libcanberra} \
         ${VIM_ENABLE_PERL:+perl} \
         ${VIM_ENABLE_PYTHON:+python2} \
         ${VIM_ENABLE_PYTHON3:+python3${PYTHON3_VERSION_DETAIL}} \
@@ -53,6 +55,7 @@ RUN apk add \
         ncurses-dev \
         acl-dev \
         ${VIM_ENABLE_GUI:+gtk+3.0-dev libxmu-dev libxpm-dev} \
+        ${VIM_ENABLE_SOUND:+libcanberra-dev} \
         ${VIM_ENABLE_PERL:+perl-dev} \
         ${VIM_ENABLE_PYTHON:+python2-dev} \
         ${VIM_ENABLE_PYTHON3:+python3-dev} \
