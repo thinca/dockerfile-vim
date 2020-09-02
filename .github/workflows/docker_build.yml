@@ -65,8 +65,9 @@ jobs:
       - name: 'Build'
         env:
           DOCKER_BUILDKIT: '1'
+          DOCKER_HUB_TOKEN: '${{ secrets.DOCKER_HUB_TOKEN }}'
         run: |
-          docker login --username '${{ secrets.DOCKER_HUB_USER }}' --password '${{ secrets.DOCKER_HUB_TOKEN }}'
+          echo "${DOCKER_HUB_TOKEN}" | docker login --username '${{ secrets.DOCKER_HUB_USER }}' --password-stdin
 
           build() {
             local target=$1
@@ -93,6 +94,8 @@ jobs:
           build release
 
       - name: 'Push'
+        env:
+          PERSONAL_ACCESS_TOKEN_GITHUB: '${{ secrets.PERSONAL_ACCESS_TOKEN_GITHUB }}'
         run: |
           docker tag vim:iconv "${CACHE_IMAGE_ICONV}"
           docker push "${CACHE_IMAGE_ICONV}"
@@ -106,7 +109,7 @@ jobs:
           docker tag vim:release "${RELEASE_IMAGE}"
           docker push "${RELEASE_IMAGE}"
 
-          docker login docker.pkg.github.com --username '${{ github.repository_owner }}' --password '${{ secrets.PERSONAL_ACCESS_TOKEN_GITHUB }}'
+          echo "${PERSONAL_ACCESS_TOKEN_GITHUB}" | docker login docker.pkg.github.com --username '${{ github.repository_owner }}' --password-stdin
           docker tag vim:release "${GITHUB_RELEASE_IMAGE}"
           docker push "${GITHUB_RELEASE_IMAGE}"
 
