@@ -85,7 +85,7 @@ jobs:
               --build-arg "VIM_ENABLE_ALL=${{ matrix.image_type == 'full' && 'yes' || '' }}" \
               --build-arg "VIM_COMPILEDBY=Docker <https://github.com/thinca/dockerfile-vim>" \
               --progress plain \
-              ./base
+              ./alpine
           }
 
           build iconv "${CACHE_IMAGE_ICONV}"
