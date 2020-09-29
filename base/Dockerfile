@@ -60,8 +60,8 @@ RUN apk add \
         ${VIM_ENABLE_PYTHON:+python2-dev} \
         ${VIM_ENABLE_PYTHON3:+python3-dev} \
         ${VIM_ENABLE_RUBY:+ruby-dev} \
-        ${VIM_ENABLE_TCL:+tcl-dev} \
         ${VIM_ENABLE_LUA:+lua${LUA_VERSION}-dev luajit-dev} \
+        ${VIM_ENABLE_TCL:+tcl-dev} \
         ${VIM_ENABLE_MZSCHEME:+racket-dev}
 RUN [ -z "${VIM_ENABLE_MZSCHEME}" ] || raco pkg install --batch --auto cext-lib
 RUN mkdir -p /usr/src/vim
