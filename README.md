@@ -17,6 +17,14 @@ $ docker run --rm -it -e COLUMNS="$(tput cols)" -e LINES="$(tput lines)" thinca/
 ```
 
 
+## Base image
+
+The following base images are available.
+
+- [Alpine Linux](https://hub.docker.com/_/alpine) - `alpine/` directory.
+- [Ubuntu](https://hub.docker.com/_/ubuntu) - `ubuntu/` directory.
+
+
 ## Build Arguments
 
 Note: Buildkit is required to build this image:
@@ -97,7 +105,7 @@ default: Follows to [`VIM_ENABLE_ALL`](#vim_enable_all)
 
 ### `PYTHON3_VERSION`
 
-A version of Python 3.
+A version of Python 3.  This works with Alpine Linux only.
 
 You can only specify `3.7` or empty.
 `3.8` is used when this is empty.
