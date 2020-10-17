@@ -125,20 +125,6 @@ When this is not empty, Ruby interface is enabled.
 default: Follows to [`VIM_ENABLE_ALL`](#vim_enable_all)
 
 
-### `VIM_ENABLE_TCL`
-
-When this is not empty, Tcl interface is enabled.
-
-default: Follows to [`VIM_ENABLE_ALL`](#vim_enable_all)
-
-
-### `VIM_ENABLE_MZSCHEME`
-
-When this is not empty, MzScheme(Racket) interface is enabled.
-
-default: Follows to [`VIM_ENABLE_ALL`](#vim_enable_all)
-
-
 ### `VIM_ENABLE_LUA`
 
 When this is not empty, Lua interface is enabled.
@@ -156,6 +142,20 @@ default: `5.3`
 ```
 $ docker build --build-arg 'VIM_VERSION=v7.4.092' --build-arg 'LUA_VERSION=5.1' --tag 'vim:v7.4.092' .
 ```
+
+
+### `VIM_ENABLE_TCL`
+
+When this is not empty, Tcl interface is enabled.
+
+default: Follows to [`VIM_ENABLE_ALL`](#vim_enable_all)
+
+
+### `VIM_ENABLE_MZSCHEME`
+
+When this is not empty, MzScheme(Racket) interface is enabled.
+
+default: Follows to [`VIM_ENABLE_ALL`](#vim_enable_all)
 
 
 ### `VIM_COMPILEDBY`
