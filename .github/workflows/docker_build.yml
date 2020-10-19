@@ -118,20 +118,13 @@ jobs:
           push-release-image "${VIM_VERSION}"
 
           # Push latest tag when the target version is head.
-          vim-sha() {
-            wget --method=GET \
-            --quiet --content-on-error \
-            --output-document=- \
-            --header 'Accept: application/vnd.github.v3+json' \
-            --header 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
-            "https://api.github.com/repos/vim/vim/git/refs/${1}" | jq -r '.object.sha'
-          }
+          remotes=$(git ls-remote --tags --heads https://github.com/vim/vim)
 
-          target_sha=$(vim-sha tags/${VIM_VERSION})
+          target_sha=$(echo "${remotes}" | grep "refs/tags/${VIM_VERSION}$" | cut -f1)
           echo "target_sha: ${target_sha}"
-          master_sha=$(vim-sha heads/master)
+          master_sha=$(echo "${remotes}" | grep "refs/heads/master$" | cut -f1)
           echo "master_sha: ${master_sha}"
-          if [[ "${target_sha}" != "null" && "${target_sha}" == "${master_sha}" ]]; then
+          if [[ -n "${target_sha}" && "${target_sha}" == "${master_sha}" ]]; then
             push-release-image "latest"
           fi
 
