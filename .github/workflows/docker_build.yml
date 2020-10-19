@@ -1,8 +1,5 @@
 name: 'Docker Build'
 on:
-  push:
-    tags:
-      - "v*"
   workflow_dispatch:
     inputs:
       vim_version:
@@ -127,17 +124,3 @@ jobs:
           if [[ -n "${target_sha}" && "${target_sha}" == "${master_sha}" ]]; then
             push-release-image "latest"
           fi
-
-  delete-tag:
-    name: 'Delete processed tag'
-    needs: 'build-and-push'
-    runs-on: 'ubuntu-latest'
-    if: "always() && startsWith(github.ref, 'refs/tags/v')"
-    steps:
-      - run: |
-          wget --method=DELETE \
-          --quiet --content-on-error \
-          --output-document=- \
-          --header 'Accept: application/vnd.github.v3+json' \
-          --header 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
-          'https://api.github.com/repos/${{ github.repository }}/git/${{ github.ref }}'
