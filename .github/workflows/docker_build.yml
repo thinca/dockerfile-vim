@@ -50,16 +50,16 @@ jobs:
             full="-full"
           fi
 
-          echo "::set-env name=VIM_VERSION::${VIM_VERSION}"
-          echo "::set-env name=LUA_VERSION::${LUA_VERSION}"
-          echo "::set-env name=CACHE_IMAGE_ICONV::${CACHE_IMAGE_NAME}:stage-cache-iconv"
-          echo "::set-env name=CACHE_IMAGE_PREPARE::${CACHE_IMAGE_NAME}:stage-cache-prepare${prepare_type}"
-          echo "::set-env name=RELEASE_IMAGE::${RELEASE_IMAGE_NAME}:${VIM_VERSION}${full}"
-          echo "::set-env name=LATEST_IMAGE::${RELEASE_IMAGE_NAME}:latest${full}"
+          echo "VIM_VERSION=${VIM_VERSION}" >> ${GITHUB_ENV}
+          echo "LUA_VERSION=${LUA_VERSION}" >> ${GITHUB_ENV}
+          echo "CACHE_IMAGE_ICONV=${CACHE_IMAGE_NAME}:stage-cache-iconv" >> ${GITHUB_ENV}
+          echo "CACHE_IMAGE_PREPARE=${CACHE_IMAGE_NAME}:stage-cache-prepare${prepare_type}" >> ${GITHUB_ENV}
+          echo "RELEASE_IMAGE=${RELEASE_IMAGE_NAME}:${VIM_VERSION}${full}" >> ${GITHUB_ENV}
+          echo "LATEST_IMAGE=${RELEASE_IMAGE_NAME}:latest${full}" >> ${GITHUB_ENV}
 
           ghcr_image_name="ghcr.io/${{ github.repository_owner }}/vim"
-          echo "::set-env name=GHCR_RELEASE_IMAGE::${ghcr_image_name}:${VIM_VERSION}${full}"
-          echo "::set-env name=GHCR_LATEST_IMAGE::${ghcr_image_name}:latest${full}"
+          echo "GHCR_RELEASE_IMAGE=${ghcr_image_name}:${VIM_VERSION}${full}" >> ${GITHUB_ENV}
+          echo "GHCR_LATEST_IMAGE=${ghcr_image_name}:latest${full}" >> ${GITHUB_ENV}
       - uses: 'actions/checkout@v2'
       - name: 'Build'
         env:
