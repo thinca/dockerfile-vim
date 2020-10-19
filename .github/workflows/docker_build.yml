@@ -11,15 +11,17 @@ on:
 
 jobs:
   build-and-push:
-    name: 'Build ${{ matrix.image_type }} docker image and push'
+    name: 'Build ${{ matrix.image_type }} on ${{ matrix.base }}'
     strategy:
       matrix:
-        image_type: ['minimum', 'full']
+        image_type: ['basic', 'full']
+        base: ['alpine', 'ubuntu']
       fail-fast: false
     runs-on: 'ubuntu-latest'
     env:
       CACHE_IMAGE_NAME: 'thinca/vim'
       RELEASE_IMAGE_NAME: 'thinca/vim'
+      GHCR_IMAGE_NAME: 'ghcr.io/${{ github.repository_owner }}/vim'
     steps:
       - name: 'Prepare variables'
         run: |
@@ -43,23 +45,16 @@ jobs:
             LUA_VERSION=5.1
           fi
 
-          prepare_type=
-          full=
+          prepare_type=-basic
           if [[ '${{ matrix.image_type }}' = 'full' ]]; then
             prepare_type="-full-lua${LUA_VERSION}"
-            full="-full"
           fi
 
           echo "VIM_VERSION=${VIM_VERSION}" >> ${GITHUB_ENV}
           echo "LUA_VERSION=${LUA_VERSION}" >> ${GITHUB_ENV}
-          echo "CACHE_IMAGE_ICONV=${CACHE_IMAGE_NAME}:stage-cache-iconv" >> ${GITHUB_ENV}
-          echo "CACHE_IMAGE_PREPARE=${CACHE_IMAGE_NAME}:stage-cache-prepare${prepare_type}" >> ${GITHUB_ENV}
-          echo "RELEASE_IMAGE=${RELEASE_IMAGE_NAME}:${VIM_VERSION}${full}" >> ${GITHUB_ENV}
-          echo "LATEST_IMAGE=${RELEASE_IMAGE_NAME}:latest${full}" >> ${GITHUB_ENV}
+          echo "CACHE_IMAGE_ICONV=${CACHE_IMAGE_NAME}:stage-cache-iconv-${{ matrix.base }}" >> ${GITHUB_ENV}
+          echo "CACHE_IMAGE_PREPARE=${CACHE_IMAGE_NAME}:stage-cache-prepare${prepare_type}-${{ matrix.base }}" >> ${GITHUB_ENV}
 
-          ghcr_image_name="ghcr.io/${{ github.repository_owner }}/vim"
-          echo "GHCR_RELEASE_IMAGE=${ghcr_image_name}:${VIM_VERSION}${full}" >> ${GITHUB_ENV}
-          echo "GHCR_LATEST_IMAGE=${ghcr_image_name}:latest${full}" >> ${GITHUB_ENV}
       - uses: 'actions/checkout@v2'
       - name: 'Build'
         env:
@@ -85,10 +80,12 @@ jobs:
               --build-arg "VIM_ENABLE_ALL=${{ matrix.image_type == 'full' && 'yes' || '' }}" \
               --build-arg "VIM_COMPILEDBY=Docker <https://github.com/thinca/dockerfile-vim>" \
               --progress plain \
-              ./alpine
+              ./${{ matrix.base }}
           }
 
-          build iconv "${CACHE_IMAGE_ICONV}"
+          if [[ "${{ matrix.base }}" == "alpine" ]]; then
+            build iconv "${CACHE_IMAGE_ICONV}"
+          fi
           build prepare "${CACHE_IMAGE_PREPARE}"
           build release
 
@@ -96,21 +93,51 @@ jobs:
         env:
           PERSONAL_ACCESS_TOKEN_GITHUB: '${{ secrets.PERSONAL_ACCESS_TOKEN_GITHUB }}'
         run: |
-          docker tag vim:iconv "${CACHE_IMAGE_ICONV}"
-          docker push "${CACHE_IMAGE_ICONV}"
+          # Push cache images
+          if [[ "${{ matrix.base }}" == "alpine" ]]; then
+            docker tag vim:iconv "${CACHE_IMAGE_ICONV}"
+            docker push "${CACHE_IMAGE_ICONV}"
+          fi
 
           docker tag vim:prepare "${CACHE_IMAGE_PREPARE}"
           docker push "${CACHE_IMAGE_PREPARE}"
 
-          docker tag vim:release "${RELEASE_IMAGE}"
-          docker push "${RELEASE_IMAGE}"
-
-          docker tag vim:release "${RELEASE_IMAGE}"
-          docker push "${RELEASE_IMAGE}"
-
+          # Login to ghcr.io
           echo "${PERSONAL_ACCESS_TOKEN_GITHUB}" | docker login ghcr.io --username '${{ github.repository_owner }}' --password-stdin
-          docker tag vim:release "${GHCR_RELEASE_IMAGE}"
-          docker push "${GHCR_RELEASE_IMAGE}"
+
+          push-image-tag-to-multi() {
+            local tag=$1
+
+            # Push to Docker Hub
+            RELEASE_IMAGE="${RELEASE_IMAGE_NAME}:${tag}"
+            docker tag vim:release "${RELEASE_IMAGE}"
+            docker push "${RELEASE_IMAGE}"
+
+            # Push to GitHub Container Registry
+            GHCR_RELEASE_IMAGE="${GHCR_IMAGE_NAME}:${tag}"
+            docker tag vim:release "${GHCR_RELEASE_IMAGE}"
+            docker push "${GHCR_RELEASE_IMAGE}"
+          }
+
+          push-release-image() {
+            local version=$1
+
+            push-image-tag-to-multi "${version}-${{ matrix.image_type }}-${{ matrix.base }}"
+
+            if [[ "${{ matrix.base }}" == "alpine" ]]; then
+              push-image-tag-to-multi "${version}-${{ matrix.image_type }}"
+
+              if [[ "${{ matrix.image_type }}" == "basic" ]]; then
+                push-image-tag-to-multi "${version}"
+              fi
+            fi
+
+            if [[ "${{ matrix.image_type }}" == "basic" ]]; then
+              push-image-tag-to-multi "${version}-${{ matrix.base }}"
+            fi
+          }
+
+          push-release-image "${VIM_VERSION}"
 
           # Push latest tag when the target version is head.
           vim-sha() {
@@ -127,10 +154,7 @@ jobs:
           master_sha=$(vim-sha heads/master)
           echo "master_sha: ${master_sha}"
           if [[ "${target_sha}" != "null" && "${target_sha}" == "${master_sha}" ]]; then
-            docker tag vim:release "${LATEST_IMAGE}"
-            docker push "${LATEST_IMAGE}"
-            docker tag vim:release "${GHCR_LATEST_IMAGE}"
-            docker push "${GHCR_LATEST_IMAGE}"
+            push-release-image "latest"
           fi
 
   delete-tag:
