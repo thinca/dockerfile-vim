@@ -25,35 +25,14 @@ jobs:
     steps:
       - name: 'Prepare variables'
         run: |
-          vercmp() {
-            local X="${1}"
-            local Y="${2}"
-
-            local X_NORMALIZED="$(printf "%d%02d%04.0f" $(echo ${X} | tr '.' ' '))"
-            local Y_NORMALIZED="$(printf "%d%02d%04.0f" $(echo ${Y} | tr '.' ' '))"
-
-            [[ ${X_NORMALIZED} -gt ${Y_NORMALIZED} ]]
-          }
-
           INPUT_REF='${{ github.event.inputs.vim_version }}'
           : ${INPUT_REF:=${GITHUB_REF}}
           ORIGINAL_TAG=${INPUT_REF##*/}
           VIM_VERSION=${ORIGINAL_TAG%+*}
 
-          LUA_VERSION=5.3
-          if vercmp 7.4.093 "${VIM_VERSION#v}"; then
-            LUA_VERSION=5.1
-          fi
-
-          prepare_type=-basic
-          if [[ '${{ matrix.image_type }}' = 'full' ]]; then
-            prepare_type="-full-lua${LUA_VERSION}"
-          fi
-
           echo "VIM_VERSION=${VIM_VERSION}" >> ${GITHUB_ENV}
-          echo "LUA_VERSION=${LUA_VERSION}" >> ${GITHUB_ENV}
           echo "CACHE_IMAGE_ICONV=${CACHE_IMAGE_NAME}:stage-cache-iconv-${{ matrix.base }}" >> ${GITHUB_ENV}
-          echo "CACHE_IMAGE_PREPARE=${CACHE_IMAGE_NAME}:stage-cache-prepare${prepare_type}-${{ matrix.base }}" >> ${GITHUB_ENV}
+          echo "CACHE_IMAGE_PREPARE=${CACHE_IMAGE_NAME}:stage-cache-prepare-${{ matrix.image_type }}-${{ matrix.base }}" >> ${GITHUB_ENV}
 
       - uses: 'actions/checkout@v2'
       - name: 'Build'
@@ -76,7 +55,6 @@ jobs:
               ${cache_from} \
               --build-arg BUILDKIT_INLINE_CACHE=1 \
               --build-arg "VIM_VERSION=${VIM_VERSION}" \
-              --build-arg "LUA_VERSION=${LUA_VERSION}" \
               --build-arg "VIM_ENABLE_ALL=${{ matrix.image_type == 'full' && 'yes' || '' }}" \
               --build-arg "VIM_COMPILEDBY=Docker <https://github.com/thinca/dockerfile-vim>" \
               --progress plain \
