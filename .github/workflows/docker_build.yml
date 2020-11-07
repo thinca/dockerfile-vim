@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
     runs-on: 'ubuntu-latest'
     env:
-      CACHE_IMAGE_NAME: 'thinca/vim'
+      CACHE_IMAGE_NAME: 'ghcr.io/${{ github.repository_owner }}/vim'
       RELEASE_IMAGE_NAME: 'thinca/vim'
       GHCR_IMAGE_NAME: 'ghcr.io/${{ github.repository_owner }}/vim'
     steps:
@@ -37,7 +37,10 @@ jobs:
           DOCKER_BUILDKIT: '1'
           DOCKER_HUB_TOKEN: '${{ secrets.DOCKER_HUB_TOKEN }}'
         run: |
+          # Login to hub.docker.com
           echo "${DOCKER_HUB_TOKEN}" | docker login --username '${{ secrets.DOCKER_HUB_USER }}' --password-stdin
+          # Login to ghcr.io
+          echo "${PERSONAL_ACCESS_TOKEN_GITHUB}" | docker login ghcr.io --username '${{ github.repository_owner }}' --password-stdin
 
           build() {
             local target=$1
@@ -76,9 +79,6 @@ jobs:
 
           docker tag vim:prepare "${CACHE_IMAGE_PREPARE}"
           docker push "${CACHE_IMAGE_PREPARE}"
-
-          # Login to ghcr.io
-          echo "${PERSONAL_ACCESS_TOKEN_GITHUB}" | docker login ghcr.io --username '${{ github.repository_owner }}' --password-stdin
 
           push-image-tag-to-multi() {
             local tag=$1
