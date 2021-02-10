@@ -35,6 +35,7 @@ FROM base AS prepare
 RUN apt-get update \
  && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y \
+        curl \
         build-essential \
         gettext \
         libtinfo-dev \
