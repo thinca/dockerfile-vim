@@ -64,7 +64,6 @@ RUN apk add \
         ${VIM_ENABLE_TCL:+tcl-dev} \
         ${VIM_ENABLE_MZSCHEME:+racket-dev}
 RUN [ -z "${VIM_ENABLE_MZSCHEME}" ] || raco pkg install --batch --auto cext-lib
-RUN mkdir -p /usr/src/vim
 
 
 FROM prepare AS build
@@ -72,6 +71,7 @@ FROM prepare AS build
 ARG VIM_VERSION=master
 ARG VIM_COMPILEDBY=""
 
+RUN mkdir -p /usr/src/vim
 RUN wget --quiet --output-document - \
         "https://github.com/vim/vim/archive/${VIM_VERSION}.tar.gz" | \
         tar xz --directory=/usr/src/vim --strip-components=1

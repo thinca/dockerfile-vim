@@ -44,7 +44,6 @@ RUN apt-get update \
         ${VIM_ENABLE_RUBY:+ruby-dev} \
         ${VIM_ENABLE_LUA:+lua${LUA_VERSION}-dev libluajit-5.1-dev} \
         ${VIM_ENABLE_TCL:+tcl-dev}
-RUN mkdir -p /usr/src/vim
 
 
 FROM prepare AS build
@@ -52,6 +51,7 @@ FROM prepare AS build
 ARG VIM_VERSION=master
 ARG VIM_COMPILEDBY=""
 
+RUN mkdir -p /usr/src/vim
 RUN curl --silent --location \
         "https://github.com/vim/vim/archive/${VIM_VERSION}.tar.gz" | \
         tar xz --directory=/usr/src/vim --strip-components=1
