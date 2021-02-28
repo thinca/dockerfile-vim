@@ -1,4 +1,4 @@
-FROM alpine:3.12 AS iconv
+FROM alpine:3.13 AS iconv
 
 RUN apk add --no-cache g++ make
 RUN wget --quiet --output-document - http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.16.tar.gz | \
@@ -8,7 +8,7 @@ RUN make
 RUN make install
 
 
-FROM alpine:3.12 AS base
+FROM alpine:3.13 AS base
 
 ARG VIM_ENABLE_ALL=""
 ARG VIM_ENABLE_GUI="${VIM_ENABLE_ALL}"
@@ -24,8 +24,7 @@ ARG LUA_VERSION="5.3"
 ARG PYTHON3_VERSION=""
 
 RUN { [ -z "${VIM_ENABLE_MZSCHEME}" ] || \
-    { echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories; \
-      echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories; }; } \
+    echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories; } \
  && { [ -z "${VIM_ENABLE_PYTHON3}" -o "v${PYTHON3_VERSION}" != "v3.7" ] || \
       { echo "http://dl-cdn.alpinelinux.org/alpine/v3.10/main" >> /etc/apk/repositories; \
       PYTHON3_VERSION_DETAIL="=3.7.5-r1"; }; } \
