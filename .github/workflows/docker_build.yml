@@ -49,6 +49,12 @@ jobs:
             if [[ -n "$2" ]]; then
               cache_from="--cache-from=$2"
             fi
+
+            # Temporarily disables the cache on basic-ubuntu because empty docker layer is created with unknown reason.
+            if [[ "${{ matrix.image_type }}-${{ matrix.base }}" == "basic-ubuntu" ]]; then
+              cache_from=
+            fi
+
             echo "-- build ${target} --"
             docker build \
               --tag "vim:${target}" \
