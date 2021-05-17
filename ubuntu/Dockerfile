@@ -77,6 +77,7 @@ RUN make install
 FROM base AS release
 
 LABEL maintainer="thinca <thinca+vim@gmail.com>"
+LABEL org.opencontainers.image.source="https://github.com/thinca/dockerfile-vim"
 
 COPY --from=build /usr/local /usr/local/
 
