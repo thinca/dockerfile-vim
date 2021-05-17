@@ -35,12 +35,11 @@ jobs:
       - name: 'Build'
         env:
           DOCKER_BUILDKIT: '1'
-          DOCKER_HUB_TOKEN: '${{ secrets.DOCKER_HUB_TOKEN }}'
         run: |
           # Login to hub.docker.com
-          echo "${DOCKER_HUB_TOKEN}" | docker login --username '${{ secrets.DOCKER_HUB_USER }}' --password-stdin
+          docker login --username '${{ secrets.DOCKER_HUB_USER }}' --password-stdin <<<"${{ secrets.DOCKER_HUB_TOKEN }}"
           # Login to ghcr.io
-          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io --username '${{ github.repository_owner }}' --password-stdin
+          docker login ghcr.io --username '${{ github.repository_owner }}' --password-stdin <<<"${{ secrets.GITHUB_TOKEN }}"
 
           build() {
             local target=$1
