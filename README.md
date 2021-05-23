@@ -21,9 +21,22 @@ $ docker run --rm -it -e COLUMNS="$(tput cols)" -e LINES="$(tput lines)" thinca/
 
 The following base images are available.
 
-- [Alpine Linux](https://hub.docker.com/_/alpine) - `alpine/` directory.
-- [Ubuntu](https://hub.docker.com/_/ubuntu) - `ubuntu/` directory.
+- [Alpine Linux](https://hub.docker.com/_/alpine) - [`alpine/` directory](https://github.com/thinca/dockerfile-vim/blob/master/alpine).
+- [Ubuntu](      https://hub.docker.com/_/ubuntu) - [`ubuntu/` directory](https://github.com/thinca/dockerfile-vim/blob/master/ubuntu).
 
+### On Docker Hub
+
+- [Container Home](https://hub.docker.com/r/thinca/vim)
+- [Full Alpine](   https://hub.docker.com/r/thinca/vim/tags?name=latest-full-alpine)
+- [Full Ubuntu](   https://hub.docker.com/r/thinca/vim/tags?name=latest-full-ubuntu)
+- [Basic Alpine](  https://hub.docker.com/r/thinca/vim/tags?name=latest-basic-alpine)
+- [Basic Ubuntu](  https://hub.docker.com/r/thinca/vim/tags?name=latest-basic-ubuntu)
+
+### On GitHub
+
+- [Repo Home](        https://github.com/thinca/dockerfile-vim/blob/master/alpine/Dockerfile)
+- [Alpine Dockerfile](https://github.com/thinca/dockerfile-vim/blob/master/alpine/Dockerfile)
+- [Ubuntu Dockerfile](https://github.com/thinca/dockerfile-vim/blob/master/ubuntu/Dockerfile)
 
 ## Build Arguments
 
