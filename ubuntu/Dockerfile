@@ -1,4 +1,4 @@
-FROM ubuntu:20.10 AS base
+FROM ubuntu:21.10 AS base
 
 ARG VIM_ENABLE_ALL=""
 ARG VIM_ENABLE_GUI="${VIM_ENABLE_ALL}"
