@@ -8,7 +8,7 @@ on:
       update_cache:
         description: 'Do not use cache layer and update it'
         required: false
-        default: false
+        default: 'false'
         type: 'boolean'
 
 jobs:
