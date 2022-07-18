@@ -1,7 +1,7 @@
 FROM alpine:edge AS iconv
 
 RUN apk add --no-cache g++ make
-RUN wget --quiet --output-document - http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.16.tar.gz | \
+RUN wget --quiet --output-document - http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.17.tar.gz | \
         tar -xz --strip-components=1
 RUN ./configure
 RUN make
