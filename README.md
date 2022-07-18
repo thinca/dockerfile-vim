@@ -108,7 +108,7 @@ default: Follows to [`VIM_ENABLE_ALL`](#vim_enable_all)
 A version of Python 3.  This works with Alpine Linux only.
 
 You can only specify `3.7` or empty.
-`3.8` is used when this is empty.
+Latest version will be used when this is empty.
 
 Vim built with Python 2.x and Python 3.8 is only available either `if_python` or `if_python3`.
 
