@@ -24,9 +24,9 @@ ARG LUA_VERSION="5.3"
 ARG PYTHON3_VERSION=""
 
 RUN { [ -z "${VIM_ENABLE_MZSCHEME}" ] || \
-      echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories; } \
+      echo "https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories; } \
  && { [ -z "${VIM_ENABLE_PYTHON3}" -o "v${PYTHON3_VERSION}" != "v3.7" ] || \
-      { echo "http://dl-cdn.alpinelinux.org/alpine/v3.10/main" >> /etc/apk/repositories; \
+      { echo "https://dl-cdn.alpinelinux.org/alpine/v3.10/main" >> /etc/apk/repositories; \
       PYTHON3_VERSION_DETAIL="=3.7.5-r1"; }; } \
  && apk add --no-cache \
         ncurses \
