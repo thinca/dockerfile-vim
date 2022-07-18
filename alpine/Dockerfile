@@ -28,6 +28,8 @@ RUN { [ -z "${VIM_ENABLE_MZSCHEME}" ] || \
  && { [ -z "${VIM_ENABLE_PYTHON3}" -o "v${PYTHON3_VERSION}" != "v3.7" ] || \
       { echo "https://dl-cdn.alpinelinux.org/alpine/v3.10/main" >> /etc/apk/repositories; \
       PYTHON3_VERSION_DETAIL="=3.7.5-r1"; }; } \
+ && { [ -z "${VIM_ENABLE_PYTHON}" ] || \
+      echo "https://dl-cdn.alpinelinux.org/alpine/v3.15/community" >> /etc/apk/repositories; } \
  && apk add --no-cache \
         ncurses \
         acl \
