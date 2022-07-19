@@ -20,7 +20,7 @@ RUN [ -z "${VIM_ENABLE_GUI}${VIM_ENABLE_SOUND}${VIM_ENABLE_PERL}${VIM_ENABLE_PYT
         ${VIM_ENABLE_GUI:+libgtk-3-0 libxmu6 libxpm4} \
         ${VIM_ENABLE_SOUND:+libcanberra0} \
         ${VIM_ENABLE_PERL:+perl} \
-        ${VIM_ENABLE_PYTHON:+python-dev} \
+        ${VIM_ENABLE_PYTHON:+python2-dev} \
         ${VIM_ENABLE_PYTHON3:+python3-dev} \
         ${VIM_ENABLE_RUBY:+ruby} \
         ${VIM_ENABLE_LUA:+lua${LUA_VERSION} luajit} \
