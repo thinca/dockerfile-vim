@@ -16,7 +16,7 @@ ARG PYTHON3_VERSION=""
 RUN [ -z "${VIM_ENABLE_GUI}${VIM_ENABLE_SOUND}${VIM_ENABLE_PERL}${VIM_ENABLE_PYTHON}${VIM_ENABLE_PYTHON3}${VIM_ENABLE_RUBY}${VIM_ENABLE_LUA}${VIM_ENABLE_TCL}${VIM_ENABLE_MZSCHEME}" ] \
  || apt-get update \
  && DEBIAN_FRONTEND=noninteractive \
-    apt-get install -y \
+    apt-get --no-install-recommends install -y \
         ${VIM_ENABLE_GUI:+libgtk-3-0 libxmu6 libxpm4} \
         ${VIM_ENABLE_SOUND:+libcanberra0} \
         ${VIM_ENABLE_PERL:+perl} \
@@ -34,8 +34,9 @@ FROM base AS prepare
 
 RUN apt-get update \
  && DEBIAN_FRONTEND=noninteractive \
-    apt-get install -y \
+    apt-get --no-install-recommends install -y \
         curl \
+        ca-certificates \
         build-essential \
         gettext \
         libtinfo-dev \
