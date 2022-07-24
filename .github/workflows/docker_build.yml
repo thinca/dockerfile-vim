@@ -34,6 +34,7 @@ jobs:
 
           echo "VIM_VERSION=${VIM_VERSION}" >> ${GITHUB_ENV}
           echo "CACHE_IMAGE_ICONV=${CACHE_IMAGE_NAME}:stage-cache-iconv-${{ matrix.base }}" >> ${GITHUB_ENV}
+          echo "CACHE_IMAGE_RACKET=${CACHE_IMAGE_NAME}:stage-cache-racket-${{ matrix.base }}" >> ${GITHUB_ENV}
           echo "CACHE_IMAGE_PREPARE=${CACHE_IMAGE_NAME}:stage-cache-prepare-${{ matrix.image_type }}-${{ matrix.base }}" >> ${GITHUB_ENV}
 
       - uses: 'actions/checkout@v2'
@@ -74,6 +75,9 @@ jobs:
           if [[ "${{ matrix.base }}" == "alpine" ]]; then
             build iconv "${CACHE_IMAGE_ICONV}"
           fi
+          if [[ "${{ matrix.base }}" == "ubuntu" && "${{ matrix.image_type }}" == "full" ]]; then
+            build racket "${CACHE_IMAGE_RACKET}"
+          fi
           build prepare "${CACHE_IMAGE_PREPARE}"
           build release
 
@@ -83,6 +87,11 @@ jobs:
           if [[ "${{ matrix.base }}" == "alpine" ]]; then
             docker tag vim:iconv "${CACHE_IMAGE_ICONV}"
             docker push "${CACHE_IMAGE_ICONV}"
+          fi
+
+          if [[ "${{ matrix.base }}" == "ubuntu" && "${{ matrix.image_type }}" == "full" ]]; then
+            docker tag vim:racket "${CACHE_IMAGE_RACKET}"
+            docker push "${CACHE_IMAGE_RACKET}"
           fi
 
           docker tag vim:prepare "${CACHE_IMAGE_PREPARE}"
