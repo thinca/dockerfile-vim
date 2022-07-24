@@ -160,6 +160,13 @@ When this is not empty, MzScheme(Racket) interface is enabled.
 default: Follows to [`VIM_ENABLE_ALL`](#vim_enable_all)
 
 
+### `RACKET_VERSION`
+
+A version of Racket for `+mzscheme` feature.  This works with Ubuntu Linux only.
+
+default: `8.5`
+
+
 ### `VIM_COMPILEDBY`
 
 Set to `--with-compiedby` configure option.
