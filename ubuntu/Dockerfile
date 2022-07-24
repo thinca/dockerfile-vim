@@ -1,5 +1,3 @@
-FROM ubuntu:21.10 AS base
-
 ARG VIM_ENABLE_ALL=""
 ARG VIM_ENABLE_GUI="${VIM_ENABLE_ALL}"
 ARG VIM_ENABLE_SOUND="${VIM_ENABLE_ALL}"
@@ -13,7 +11,40 @@ ARG VIM_ENABLE_MZSCHEME="${VIM_ENABLE_ALL}"
 ARG LUA_VERSION="5.3"
 ARG PYTHON3_VERSION=""
 
-RUN [ -z "${VIM_ENABLE_GUI}${VIM_ENABLE_SOUND}${VIM_ENABLE_PERL}${VIM_ENABLE_PYTHON}${VIM_ENABLE_PYTHON3}${VIM_ENABLE_RUBY}${VIM_ENABLE_LUA}${VIM_ENABLE_TCL}${VIM_ENABLE_MZSCHEME}" ] \
+FROM ubuntu:22.04 AS racket
+
+ARG RACKET_VERSION=8.5
+
+RUN apt-get update \
+ && DEBIAN_FRONTEND=noninteractive \
+    apt-get --no-install-recommends install -y \
+    curl ca-certificates \
+    build-essential libsqlite3-dev
+
+WORKDIR /usr/src/racket/src
+RUN curl --silent --location \
+        "https://mirror.racket-lang.org/installers/${RACKET_VERSION}/racket-${RACKET_VERSION}-src-builtpkgs.tgz" | \
+        tar xz --directory=/usr/src/racket --strip-components=1
+RUN ./configure --prefix "/usr/local" --enable-dynlib --enable-bcdefault --disable-futures --disable-places --disable-gracket --disable-docs
+RUN make
+RUN make install
+
+
+FROM ubuntu:22.04 AS base
+
+ARG VIM_ENABLE_ALL
+ARG VIM_ENABLE_GUI
+ARG VIM_ENABLE_SOUND
+ARG VIM_ENABLE_PERL
+ARG VIM_ENABLE_PYTHON
+ARG VIM_ENABLE_PYTHON3
+ARG VIM_ENABLE_RUBY
+ARG VIM_ENABLE_LUA
+ARG VIM_ENABLE_TCL
+ARG VIM_ENABLE_MZSCHEME
+ARG LUA_VERSION
+
+RUN [ -z "${VIM_ENABLE_GUI}${VIM_ENABLE_SOUND}${VIM_ENABLE_PERL}${VIM_ENABLE_PYTHON}${VIM_ENABLE_PYTHON3}${VIM_ENABLE_RUBY}${VIM_ENABLE_LUA}${VIM_ENABLE_TCL}" ] \
  || apt-get update \
  && DEBIAN_FRONTEND=noninteractive \
     apt-get --no-install-recommends install -y \
@@ -25,12 +56,16 @@ RUN [ -z "${VIM_ENABLE_GUI}${VIM_ENABLE_SOUND}${VIM_ENABLE_PERL}${VIM_ENABLE_PYT
         ${VIM_ENABLE_RUBY:+ruby} \
         ${VIM_ENABLE_LUA:+lua${LUA_VERSION} luajit} \
         ${VIM_ENABLE_TCL:+tcl} \
-        ${VIM_ENABLE_MZSCHEME:+racket} \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
 
-FROM base AS prepare
+FROM base AS base-racket
+
+COPY --from=racket /usr/local /usr/local/
+
+
+FROM base${VIM_ENABLE_MZSCHEME:+-racket} AS prepare
 
 RUN apt-get update \
  && DEBIAN_FRONTEND=noninteractive \
@@ -70,9 +105,9 @@ RUN ./configure \
         ${VIM_ENABLE_TCL:+--enable-tclinterp} \
         ${VIM_ENABLE_MZSCHEME:+--enable-mzschemeinterp} \
         --enable-fail-if-missing
-RUN make ${VIM_ENABLE_MZSCHEME:+MZSCHEME_LIBS="-lracket3m -lrktio -lffi"}
-RUN mv /usr/local /usr/local_bak
+RUN make
 RUN make install
+RUN rm -fr /usr/local/include/*
 
 
 FROM base AS release
