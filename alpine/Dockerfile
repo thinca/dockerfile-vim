@@ -20,7 +20,7 @@ ARG VIM_ENABLE_RUBY="${VIM_ENABLE_ALL}"
 ARG VIM_ENABLE_LUA="${VIM_ENABLE_ALL}"
 ARG VIM_ENABLE_TCL="${VIM_ENABLE_ALL}"
 ARG VIM_ENABLE_MZSCHEME="${VIM_ENABLE_ALL}"
-ARG LUA_VERSION="5.3"
+ARG LUA_VERSION="jit"
 ARG PYTHON3_VERSION=""
 
 RUN { [ -z "${VIM_ENABLE_MZSCHEME}" ] || \
@@ -41,7 +41,7 @@ RUN { [ -z "${VIM_ENABLE_MZSCHEME}" ] || \
         ${VIM_ENABLE_PYTHON:+python2} \
         ${VIM_ENABLE_PYTHON3:+python3${PYTHON3_VERSION_DETAIL}} \
         ${VIM_ENABLE_RUBY:+ruby libc6-compat} \
-        ${VIM_ENABLE_LUA:+lua${LUA_VERSION} luajit} \
+        ${VIM_ENABLE_LUA:+lua${LUA_VERSION}} \
         ${VIM_ENABLE_TCL:+tcl} \
         ${VIM_ENABLE_MZSCHEME:+racket}
 
@@ -61,7 +61,7 @@ RUN apk add \
         ${VIM_ENABLE_PYTHON:+python2-dev} \
         ${VIM_ENABLE_PYTHON3:+python3-dev} \
         ${VIM_ENABLE_RUBY:+ruby-dev} \
-        ${VIM_ENABLE_LUA:+lua${LUA_VERSION}-dev luajit-dev} \
+        ${VIM_ENABLE_LUA:+lua${LUA_VERSION}-dev} \
         ${VIM_ENABLE_TCL:+tcl-dev} \
         ${VIM_ENABLE_MZSCHEME:+racket-dev}
 RUN [ -z "${VIM_ENABLE_MZSCHEME}" ] || raco pkg install --batch --auto cext-lib
@@ -77,6 +77,9 @@ RUN wget --quiet --output-document - \
         "https://github.com/vim/vim/archive/${VIM_VERSION}.tar.gz" | \
         tar xz --directory=/usr/src/vim --strip-components=1
 WORKDIR /usr/src/vim
+RUN [ -z "${VIM_ENABLE_LUA}" -o "${LUA_VERSION}" == 'jit' ] || { \
+      ln -s "lua${LUA_VERSION}" "/usr/bin/lua"; \
+      ln -s "lua${LUA_VERSION}/liblua.a" "/usr/lib/liblua${LUA_VERSION}.a"; }
 RUN ./configure \
         --with-features=huge \
         ${VIM_COMPILEDBY:+--with-compiledby="${VIM_COMPILEDBY}"} \
@@ -85,7 +88,7 @@ RUN ./configure \
         ${VIM_ENABLE_PYTHON:+--enable-pythoninterp} \
         ${VIM_ENABLE_PYTHON3:+--enable-python3interp} \
         ${VIM_ENABLE_RUBY:+--enable-rubyinterp} \
-        ${VIM_ENABLE_LUA:+--enable-luainterp --with-luajit} \
+        ${VIM_ENABLE_LUA:+--enable-luainterp $([ "${LUA_VERSION}" = 'jit' ] && echo --with-luajit)} \
         ${VIM_ENABLE_TCL:+--enable-tclinterp} \
         ${VIM_ENABLE_MZSCHEME:+--enable-mzschemeinterp --with-plthome=/usr} \
         --enable-fail-if-missing

@@ -135,9 +135,11 @@ default: Follows to [`VIM_ENABLE_ALL`](#vim_enable_all)
 ### `LUA_VERSION`
 
 A version of lua.
+Ex: `5.4` `5.3` `5.2` `5.1` `jit`
+When you specify `jit`, luajit is enabled.
 When you use the Vim that is version before `v7.4.093`, please specify `5.1`.
 
-default: `5.3`
+default: `jit`
 
 ```
 $ docker build --build-arg 'VIM_VERSION=v7.4.092' --build-arg 'LUA_VERSION=5.1' --tag 'vim:v7.4.092' .

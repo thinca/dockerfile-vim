@@ -8,7 +8,7 @@ ARG VIM_ENABLE_RUBY="${VIM_ENABLE_ALL}"
 ARG VIM_ENABLE_LUA="${VIM_ENABLE_ALL}"
 ARG VIM_ENABLE_TCL="${VIM_ENABLE_ALL}"
 ARG VIM_ENABLE_MZSCHEME="${VIM_ENABLE_ALL}"
-ARG LUA_VERSION="5.3"
+ARG LUA_VERSION="jit"
 ARG PYTHON3_VERSION=""
 
 FROM ubuntu:22.04 AS racket
@@ -54,7 +54,7 @@ RUN [ -z "${VIM_ENABLE_GUI}${VIM_ENABLE_SOUND}${VIM_ENABLE_PERL}${VIM_ENABLE_PYT
         ${VIM_ENABLE_PYTHON:+python2-dev} \
         ${VIM_ENABLE_PYTHON3:+python3-dev} \
         ${VIM_ENABLE_RUBY:+ruby} \
-        ${VIM_ENABLE_LUA:+lua${LUA_VERSION} luajit} \
+        ${VIM_ENABLE_LUA:+lua${LUA_VERSION}} \
         ${VIM_ENABLE_TCL:+tcl} \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
@@ -79,8 +79,9 @@ RUN apt-get update \
         ${VIM_ENABLE_SOUND:+libcanberra-dev} \
         ${VIM_ENABLE_PERL:+libperl-dev} \
         ${VIM_ENABLE_RUBY:+ruby-dev} \
-        ${VIM_ENABLE_LUA:+lua${LUA_VERSION}-dev libluajit-5.1-dev} \
+        ${VIM_ENABLE_LUA:+$([ "${LUA_VERSION}" = 'jit' ] && echo libluajit-5.1-dev || echo liblua${LUA_VERSION}-dev)} \
         ${VIM_ENABLE_TCL:+tcl-dev}
+RUN ${VIM_ENABLE_LUA:+rm -f /usr/lib/x86_64-linux-gnu/liblua*.so}
 
 
 FROM prepare AS build
@@ -101,7 +102,7 @@ RUN ./configure \
         ${VIM_ENABLE_PYTHON:+--enable-pythoninterp} \
         ${VIM_ENABLE_PYTHON3:+--enable-python3interp} \
         ${VIM_ENABLE_RUBY:+--enable-rubyinterp} \
-        ${VIM_ENABLE_LUA:+--enable-luainterp --with-luajit} \
+        ${VIM_ENABLE_LUA:+--enable-luainterp $([ "${LUA_VERSION}" = 'jit' ] && echo --with-luajit)} \
         ${VIM_ENABLE_TCL:+--enable-tclinterp} \
         ${VIM_ENABLE_MZSCHEME:+--enable-mzschemeinterp} \
         --enable-fail-if-missing
