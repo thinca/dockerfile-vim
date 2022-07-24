@@ -4,7 +4,7 @@ RUN apk add --no-cache g++ make
 RUN wget --quiet --output-document - http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.17.tar.gz | \
         tar -xz --strip-components=1
 RUN ./configure
-RUN make
+RUN make -j$(nproc)
 RUN make install
 
 
@@ -92,7 +92,7 @@ RUN ./configure \
         ${VIM_ENABLE_TCL:+--enable-tclinterp} \
         ${VIM_ENABLE_MZSCHEME:+--enable-mzschemeinterp --with-plthome=/usr} \
         --enable-fail-if-missing
-RUN make
+RUN make -j$(nproc)
 RUN mv /usr/local /usr/local_bak
 RUN make install
 

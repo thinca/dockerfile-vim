@@ -26,7 +26,7 @@ RUN curl --silent --location \
         "https://mirror.racket-lang.org/installers/${RACKET_VERSION}/racket-${RACKET_VERSION}-src-builtpkgs.tgz" | \
         tar xz --directory=/usr/src/racket --strip-components=1
 RUN ./configure --prefix "/usr/local" --enable-dynlib --enable-bcdefault --disable-futures --disable-places --disable-gracket --disable-docs
-RUN make
+RUN make -j$(nproc)
 RUN make install
 
 
@@ -106,7 +106,7 @@ RUN ./configure \
         ${VIM_ENABLE_TCL:+--enable-tclinterp} \
         ${VIM_ENABLE_MZSCHEME:+--enable-mzschemeinterp} \
         --enable-fail-if-missing
-RUN make
+RUN make -j$(nproc)
 RUN make install
 RUN rm -fr /usr/local/include/*
 
