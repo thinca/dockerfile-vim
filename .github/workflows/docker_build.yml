@@ -92,18 +92,25 @@ jobs:
           docker tag vim:prepare "${CACHE_IMAGE_PREPARE}"
           docker push "${CACHE_IMAGE_PREPARE}"
 
+          retry() {
+            local i
+            for i in {1..3}; do
+              "$@" && break
+            done
+          }
+
           push-image-tag-to-multi() {
             local tag=$1
 
             # Push to Docker Hub
             local hub_image="${HUB_IMAGE_NAME}:${tag}"
             docker tag vim:release "${hub_image}"
-            docker push "${hub_image}"
+            retry docker push "${hub_image}"
 
             # Push to GitHub Container Registry
             local ghcr_image="${GHCR_IMAGE_NAME}:${tag}"
             docker tag vim:release "${ghcr_image}"
-            docker push "${ghcr_image}"
+            retry docker push "${ghcr_image}"
           }
 
           push-release-image() {
