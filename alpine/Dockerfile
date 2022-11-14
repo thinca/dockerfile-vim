@@ -29,7 +29,9 @@ RUN { [ -z "${VIM_ENABLE_MZSCHEME}" ] || \
       { echo "https://dl-cdn.alpinelinux.org/alpine/v3.10/main" >> /etc/apk/repositories; \
       PYTHON3_VERSION_DETAIL="~3.7"; }; } \
  && { [ -z "${VIM_ENABLE_PYTHON}" ] || \
-      echo "https://dl-cdn.alpinelinux.org/alpine/v3.15/community" >> /etc/apk/repositories; } \
+      echo "https://dl-cdn.alpinelinux.org/alpine/v3.15/main" >> /etc/apk/repositories; \
+      echo "https://dl-cdn.alpinelinux.org/alpine/v3.15/community" >> /etc/apk/repositories; \
+      PYTHON3_VERSION_DETAIL="~3.9"; } \
  && apk add --no-cache \
         ncurses \
         acl \
