@@ -70,7 +70,7 @@ jobs:
           if [[ "${{ matrix.base }}" == "alpine" ]]; then
             build iconv "${CACHE_IMAGE_ICONV}"
           fi
-          if [[ "${{ matrix.base }}" == "ubuntu" && "${{ matrix.image_type }}" == "full" ]]; then
+          if [[ "${{ matrix.image_type }}" == "full" ]]; then
             build racket "${CACHE_IMAGE_RACKET}"
           fi
           build prepare "${CACHE_IMAGE_PREPARE}"
@@ -84,7 +84,7 @@ jobs:
             docker push "${CACHE_IMAGE_ICONV}"
           fi
 
-          if [[ "${{ matrix.base }}" == "ubuntu" && "${{ matrix.image_type }}" == "full" ]]; then
+          if [[ "${{ matrix.image_type }}" == "full" ]]; then
             docker tag vim:racket "${CACHE_IMAGE_RACKET}"
             docker push "${CACHE_IMAGE_RACKET}"
           fi
