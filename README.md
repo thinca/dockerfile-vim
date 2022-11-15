@@ -162,7 +162,7 @@ default: Follows to [`VIM_ENABLE_ALL`](#vim_enable_all)
 
 ### `RACKET_VERSION`
 
-A version of Racket for `+mzscheme` feature.  This works with Ubuntu Linux only.
+A version of Racket for `+mzscheme` feature.
 
 default: `8.5`
 

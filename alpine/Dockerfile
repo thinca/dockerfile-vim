@@ -1,15 +1,3 @@
-FROM alpine:edge AS iconv
-
-RUN apk add --no-cache g++ make
-RUN wget --quiet --output-document - http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.17.tar.gz | \
-        tar -xz --strip-components=1
-RUN ./configure
-RUN make -j$(nproc)
-RUN make install
-
-
-FROM alpine:edge AS base
-
 ARG VIM_ENABLE_ALL=""
 ARG VIM_ENABLE_GUI="${VIM_ENABLE_ALL}"
 ARG VIM_ENABLE_SOUND="${VIM_ENABLE_ALL}"
@@ -23,9 +11,50 @@ ARG VIM_ENABLE_MZSCHEME="${VIM_ENABLE_ALL}"
 ARG LUA_VERSION="jit"
 ARG PYTHON3_VERSION=""
 
-RUN { [ -z "${VIM_ENABLE_MZSCHEME}" ] || \
-      echo "https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories; } \
- && { [ -z "${VIM_ENABLE_PYTHON3}" -o "v${PYTHON3_VERSION}" != "v3.7" ] || \
+FROM alpine:edge AS iconv
+
+RUN apk add --no-cache g++ make
+RUN wget --quiet --output-document - http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.17.tar.gz | \
+        tar -xz --strip-components=1
+RUN ./configure
+RUN make -j$(nproc)
+RUN make install
+
+
+FROM alpine:edge AS racket
+
+ARG RACKET_VERSION=8.5
+
+RUN apk add \
+    curl ca-certificates \
+    gcc libc-dev make libffi-dev sqlite-dev
+
+WORKDIR /usr/src/racket/src
+RUN curl --silent --location \
+        "https://mirror.racket-lang.org/installers/${RACKET_VERSION}/racket-${RACKET_VERSION}-src-builtpkgs.tgz" | \
+        tar xz --directory=/usr/src/racket --strip-components=1
+RUN rm -Rf bc/foreign/libffi
+RUN ./configure --prefix "/usr/local" --enable-dynlib --enable-bcdefault --disable-futures --disable-places --disable-gracket --disable-docs
+RUN make -j$(nproc)
+RUN make install
+
+
+FROM alpine:edge AS base
+
+ARG VIM_ENABLE_ALL
+ARG VIM_ENABLE_GUI
+ARG VIM_ENABLE_SOUND
+ARG VIM_ENABLE_PERL
+ARG VIM_ENABLE_PYTHON
+ARG VIM_ENABLE_PYTHON3
+ARG VIM_ENABLE_RUBY
+ARG VIM_ENABLE_LUA
+ARG VIM_ENABLE_TCL
+ARG VIM_ENABLE_MZSCHEME
+ARG LUA_VERSION
+ARG PYTHON3_VERSION
+
+RUN { [ -z "${VIM_ENABLE_PYTHON3}" -o "v${PYTHON3_VERSION}" != "v3.7" ] || \
       { echo "https://dl-cdn.alpinelinux.org/alpine/v3.10/main" >> /etc/apk/repositories; \
       PYTHON3_VERSION_DETAIL="~3.7"; }; } \
  && { [ -z "${VIM_ENABLE_PYTHON}" ] || \
@@ -44,11 +73,15 @@ RUN { [ -z "${VIM_ENABLE_MZSCHEME}" ] || \
         ${VIM_ENABLE_PYTHON3:+python3${PYTHON3_VERSION_DETAIL}} \
         ${VIM_ENABLE_RUBY:+ruby libc6-compat} \
         ${VIM_ENABLE_LUA:+lua${LUA_VERSION}} \
-        ${VIM_ENABLE_TCL:+tcl} \
-        ${VIM_ENABLE_MZSCHEME:+racket}
+        ${VIM_ENABLE_TCL:+tcl}
 
 
-FROM base AS prepare
+FROM base AS base-racket
+
+COPY --from=racket /usr/local /usr/local/
+
+
+FROM base${VIM_ENABLE_MZSCHEME:+-racket} AS prepare
 
 RUN apk add \
         gcc \
@@ -64,9 +97,7 @@ RUN apk add \
         ${VIM_ENABLE_PYTHON3:+python3-dev} \
         ${VIM_ENABLE_RUBY:+ruby-dev} \
         ${VIM_ENABLE_LUA:+lua${LUA_VERSION}-dev} \
-        ${VIM_ENABLE_TCL:+tcl-dev} \
-        ${VIM_ENABLE_MZSCHEME:+racket-dev}
-RUN [ -z "${VIM_ENABLE_MZSCHEME}" ] || raco pkg install --batch --auto cext-lib
+        ${VIM_ENABLE_TCL:+tcl-dev}
 
 
 FROM prepare AS build
@@ -92,10 +123,9 @@ RUN ./configure \
         ${VIM_ENABLE_RUBY:+--enable-rubyinterp} \
         ${VIM_ENABLE_LUA:+--enable-luainterp $([ "${LUA_VERSION}" = 'jit' ] && echo --with-luajit)} \
         ${VIM_ENABLE_TCL:+--enable-tclinterp} \
-        ${VIM_ENABLE_MZSCHEME:+--enable-mzschemeinterp --with-plthome=/usr} \
+        ${VIM_ENABLE_MZSCHEME:+--enable-mzschemeinterp} \
         --enable-fail-if-missing
 RUN make -j$(nproc)
-RUN mv /usr/local /usr/local_bak
 RUN make install
 
 
