@@ -21,6 +21,18 @@ RUN make -j$(nproc)
 RUN make install
 
 
+FROM alpine:edge AS gettext
+
+RUN apk add --no-cache g++ make
+RUN wget --quiet --output-document - https://ftp.gnu.org/pub/gnu/gettext/gettext-0.22.tar.gz | \
+        tar -xz --strip-components=1
+COPY --from=iconv /usr/local/include /usr/include/
+COPY --from=iconv /usr/local/lib /usr/lib/
+RUN ./configure
+RUN make -j$(nproc)
+RUN make install
+
+
 FROM alpine:edge AS racket
 
 ARG RACKET_VERSION=8.5
@@ -65,7 +77,7 @@ RUN { [ -z "${VIM_ENABLE_PYTHON3}" -o "v${PYTHON3_VERSION}" != "v3.7" ] || \
         ncurses \
         acl \
         diffutils \
-        gettext \
+        libintl \
         ${VIM_ENABLE_GUI:+gtk+3.0 libxmu libxpm} \
         ${VIM_ENABLE_SOUND:+libcanberra} \
         ${VIM_ENABLE_PERL:+perl} \
@@ -87,7 +99,6 @@ RUN apk add \
         gcc \
         libc-dev \
         make \
-        gettext-dev \
         ncurses-dev \
         acl-dev \
         ${VIM_ENABLE_GUI:+gtk+3.0-dev libxmu-dev libxpm-dev} \
@@ -98,6 +109,9 @@ RUN apk add \
         ${VIM_ENABLE_RUBY:+ruby-dev} \
         ${VIM_ENABLE_LUA:+lua${LUA_VERSION}-dev} \
         ${VIM_ENABLE_TCL:+tcl-dev}
+COPY --from=iconv /usr/local/include /usr/include/
+COPY --from=iconv /usr/local/lib /usr/lib/
+COPY --from=gettext /usr/local /usr/
 
 
 FROM prepare AS build
@@ -135,7 +149,6 @@ LABEL maintainer="thinca <thinca+vim@gmail.com>"
 LABEL org.opencontainers.image.source="https://github.com/thinca/dockerfile-vim"
 
 COPY --from=build /usr/local /usr/local/
-COPY --from=iconv /usr/local/include /usr/local/include/
 COPY --from=iconv /usr/local/lib /usr/local/lib/
 
 WORKDIR /root
