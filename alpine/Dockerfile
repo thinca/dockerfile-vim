@@ -11,7 +11,7 @@ ARG VIM_ENABLE_MZSCHEME="${VIM_ENABLE_ALL}"
 ARG LUA_VERSION="jit"
 ARG PYTHON3_VERSION=""
 
-FROM alpine:edge AS iconv
+FROM alpine:3.18.2 AS iconv
 
 RUN apk add --no-cache g++ make
 RUN wget --quiet --output-document - http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.17.tar.gz | \
@@ -21,7 +21,7 @@ RUN make -j$(nproc)
 RUN make install
 
 
-FROM alpine:edge AS gettext
+FROM alpine:3.18.2 AS gettext
 
 RUN apk add --no-cache g++ make
 RUN wget --quiet --output-document - https://ftp.gnu.org/pub/gnu/gettext/gettext-0.22.tar.gz | \
@@ -33,7 +33,7 @@ RUN make -j$(nproc)
 RUN make install
 
 
-FROM alpine:edge AS racket
+FROM alpine:3.18.2 AS racket
 
 ARG RACKET_VERSION=8.5
 
@@ -51,7 +51,7 @@ RUN make -j$(nproc)
 RUN make install
 
 
-FROM alpine:edge AS base
+FROM alpine:3.18.2 AS base
 
 ARG VIM_ENABLE_ALL
 ARG VIM_ENABLE_GUI
