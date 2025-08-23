@@ -29,7 +29,6 @@ jobs:
       - name: 'Prepare variables'
         run: |
           INPUT_REF='${{ github.event.inputs.vim_version }}'
-          : ${INPUT_REF:=${GITHUB_REF}}
           ORIGINAL_TAG=${INPUT_REF##*/}
           VIM_VERSION=${ORIGINAL_TAG%+*}
 
