@@ -141,10 +141,10 @@ jobs:
           # Push latest tag when the target version is head.
           remotes=$(git ls-remote --tags --heads https://github.com/vim/vim)
 
-          target_sha=$(echo "${remotes}" | grep "refs/tags/${VIM_VERSION}$" | cut -f1)
-          echo "target_sha: ${target_sha}"
           master_sha=$(echo "${remotes}" | grep "refs/heads/master$" | cut -f1)
           echo "master_sha: ${master_sha}"
-          if [[ -n "${target_sha}" && "${target_sha}" == "${master_sha}" ]]; then
+          master_ver=$(echo "${remotes}" | grep "^${master_sha}" | grep --invert-match "refs/heads/master$" | cut -f2 | sed -e 's:refs/tags/::' -e 's:\^{}::')
+          echo "master_ver: ${master_ver}"
+          if [[ "${VIM_VERSION}" == "${master_ver}" ]]; then
             push-release-image "latest"
           fi
