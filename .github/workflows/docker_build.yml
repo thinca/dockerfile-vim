@@ -38,7 +38,7 @@ jobs:
           echo "CACHE_IMAGE_RACKET=${CACHE_IMAGE_NAME}:stage-cache-racket-${{ matrix.base }}" >> ${GITHUB_ENV}
           echo "CACHE_IMAGE_PREPARE=${CACHE_IMAGE_NAME}:stage-cache-prepare-${{ matrix.image_type }}-${{ matrix.base }}" >> ${GITHUB_ENV}
 
-      - uses: 'actions/checkout@v4'
+      - uses: 'actions/checkout@v5'
       - name: 'Build'
         env:
           DOCKER_BUILDKIT: '1'
