@@ -10,6 +10,7 @@ ARG VIM_ENABLE_TCL="${VIM_ENABLE_ALL}"
 ARG VIM_ENABLE_MZSCHEME="${VIM_ENABLE_ALL}"
 ARG LUA_VERSION="jit"
 ARG PYTHON3_VERSION=""
+ARG VIM_CONFIGURE_EXTRA_ARGS=""
 
 FROM alpine:3.18.2 AS iconv
 
@@ -138,6 +139,7 @@ RUN ./configure \
         ${VIM_ENABLE_LUA:+--enable-luainterp $([ "${LUA_VERSION}" = 'jit' ] && echo --with-luajit)} \
         ${VIM_ENABLE_TCL:+--enable-tclinterp} \
         ${VIM_ENABLE_MZSCHEME:+--enable-mzschemeinterp} \
+        ${VIM_CONFIGURE_EXTRA_ARGS} \
         --enable-fail-if-missing
 RUN make -j$(nproc)
 RUN make install

@@ -172,6 +172,13 @@ default: `8.5`
 Set to `--with-compiedby` configure option.
 
 
+### `VIM_CONFIGURE_EXTRA_ARGS`
+
+Set to extra arguments for `./configure` script.
+
+default: empty
+
+
 ## LICENSE
 
 [zlib License](LICENSE.txt)
