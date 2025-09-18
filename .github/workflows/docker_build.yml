@@ -63,6 +63,7 @@ jobs:
               --build-arg BUILDKIT_INLINE_CACHE=1 \
               --build-arg "VIM_VERSION=${VIM_VERSION}" \
               --build-arg "VIM_ENABLE_ALL=${{ matrix.image_type == 'full' && 'yes' || '' }}" \
+              --build-arg "VIM_CONFIGURE_EXTRA_ARGS=${{ matrix.image_type == 'full' && '--enable-socketserver' || '' }}" \
               --build-arg "VIM_COMPILEDBY=Docker <https://github.com/thinca/dockerfile-vim>" \
               --progress plain \
               ./${{ matrix.base }}
