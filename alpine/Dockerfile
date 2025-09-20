@@ -66,6 +66,7 @@ ARG VIM_ENABLE_TCL
 ARG VIM_ENABLE_MZSCHEME
 ARG LUA_VERSION
 ARG PYTHON3_VERSION
+ARG VIM_CONFIGURE_EXTRA_ARGS
 
 RUN { [ -z "${VIM_ENABLE_PYTHON3}" -o "v${PYTHON3_VERSION}" != "v3.7" ] || \
       { echo "https://dl-cdn.alpinelinux.org/alpine/v3.10/main" >> /etc/apk/repositories; \
